@@ -1,0 +1,23 @@
+
+AC_PREREQ(2.59)
+AC_INIT([yaml-glib], [0.00], [rainwoodman@gmail.com])
+AC_CONFIG_MACRO_DIR([config])
+AC_CONFIG_AUX_DIR([config])
+AC_SUBST(ACLOCAL_AMFLAGS, "-I config")
+AC_CONFIG_HEADERS([config.h])
+AM_INIT_AUTOMAKE([1.9 foreign])
+
+AM_MAINTAINER_MODE
+AC_PROG_LIBTOOL
+DOLT
+
+AC_PROG_CC
+AM_PROG_CC_C_O
+VALA_PROG_VALAC(0.7.2)
+
+PKG_CHECK_MODULES(GLIB, [glib-2.0 >= 2.10 gobject-2.0 >= 2.10 gmodule-2.0 >= 2.10])
+AC_SUBST(GLIB_CFLAGS)
+AC_SUBST(GLIB_LIBS)
+
+AC_CONFIG_FILES([Makefile])
+AC_OUTPUT
