@@ -1,6 +1,6 @@
 
 AC_PREREQ(2.59)
-AC_INIT([yaml-glib], [0.00], [rainwoodman@gmail.com])
+AC_INIT([yaml-glib], [0.1], [rainwoodman@gmail.com])
 AC_CONFIG_MACRO_DIR([config])
 AC_CONFIG_AUX_DIR([config])
 AC_SUBST(ACLOCAL_AMFLAGS, "-I config")
