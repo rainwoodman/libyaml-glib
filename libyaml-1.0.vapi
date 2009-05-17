@@ -26,6 +26,9 @@
 [CCode (cprefix="YAML", cheader_filename="yaml.h", lower_case_cprefix="yaml_")]
 namespace YAML {
 
+	public const string DEFAULT_SCALAR_TAG;
+	public const string DEFAULT_SEQUENCE_TAG;
+	public const string DEFAULT_MAPPING_TAG;
 	[CCode (prefix="YAML_", cname="yaml_node_type_t", has_type_id=false)]
 	public enum NodeType {
 		NO_NODE,
@@ -127,6 +130,27 @@ namespace YAML {
 	}
 
 	[CCode (has_type_id = false)]
+	public struct EventAlias {
+		public string anchor;
+	}
+
+	[CCode (has_type_id = false)]
+	public struct EventSequenceStart {
+		public string anchor;
+		public string tag;
+		public int implicity;
+		public YAML.SequenceStyle style;
+	}
+
+	[CCode (has_type_id = false)]
+	public struct EventMappingStart {
+		public string anchor;
+		public string tag;
+		public int implicity;
+		public YAML.MappingStyle style;
+	}
+
+	[CCode (has_type_id = false)]
 	/** The scalar parameters (for @c YAML_SCALAR_EVENT). */
 	public struct EventScalar {
 		/** The anchor. */
@@ -141,11 +165,15 @@ namespace YAML {
 		public int plain_implicit;
 		/** Is the tag optional for any non-plain style? */
 		public int quoted_implicit;
+		public ScalarStyle style;
 	}
 
 	[CCode (has_type_id=false)]
 	public struct EventData {
+		public YAML.EventAlias alias;
 		public YAML.EventScalar scalar;
+		public YAML.EventSequenceStart sequence_start;
+		public YAML.EventMappingStart mapping_start;
 	}
 
 	[CCode (has_type_id = false,
@@ -157,6 +185,8 @@ namespace YAML {
 		public Event.stream_start(YAML.EncodingType encoding);
 		public EventType type;
 		public YAML.EventData data;
+		public Mark start_mark;
+		public Mark end_mark;
 	}
 
 	/** The stream encoding. */
@@ -209,13 +239,15 @@ namespace YAML {
 		public string context;
 		public YAML.Mark context_mark;
 
+		public bool stream_start_produced;
+		public bool stream_end_produced;
 		[CCode (cname="yaml_parser_initialize")]
 		public Parser();
 
 		public void set_input_string(string input, size_t size);
 		public void set_intput_file(GLib.FileStream file);
 		public void set_encoding(YAML.EncodingType encoding);
-		public int parse(out YAML.Event event);
+		public bool parse(out YAML.Event event);
 	}
 
 }
