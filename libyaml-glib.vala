@@ -5,9 +5,12 @@ namespace GLib.YAML {
 		public string tag;
 		public Mark start_mark;
 		public Mark end_mark;
+		/* NOTE:
+		 * anchor has meaning across Alias node and other node types.
+		 */
 		public string anchor;
 		public class Alias:Node {
-			public string alias;
+			public Node node;
 		}
 		public class Scalar:Node {
 			public string value;
@@ -36,6 +39,7 @@ namespace GLib.YAML {
 			loader.load(ref parser, this);
 		}
 	}
+
 	internal class Loader {
 		public Loader() {}
 		private Document document;
@@ -69,6 +73,14 @@ namespace GLib.YAML {
 			
 			/* preserve the document order */
 			document.nodes.reverse();
+
+			/* resolve the aliases */
+			foreach(Node node in document.nodes) {
+				if(!(node is Node.Alias)) continue;
+				var alias_node = node as Node.Alias;
+				alias_node.node = document.anchors.lookup(alias_node.anchor);
+				return_val_if_fail (alias_node.node != null, false);
+			}
 			return true;
 		}
 		public Node load_node(ref Parser parser, ref Event last_event) {
@@ -85,9 +97,17 @@ namespace GLib.YAML {
 					assert_not_reached();
 			}
 		}
-		public Node? load_alias(ref Parser parser, ref Event last_event) {
-			assert_not_reached();
-			return null;
+		public Node? load_alias(ref Parser parser, ref Event event) {
+			Node.Alias node = new Node.Alias();
+			node.anchor = event.data.alias.anchor;
+
+			/* Push the node to the document stack
+			 * and register the anchor */
+			document.nodes.prepend(node);
+			if(node.anchor != null)
+				document.anchors.insert(node.anchor, node);
+
+			return node;
 		}
 		private static string normalize_tag(string? tag, string @default) {
 			if(tag == null || tag == "!") {
