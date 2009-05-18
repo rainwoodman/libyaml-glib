@@ -244,8 +244,21 @@ namespace YAML {
 		[CCode (cname="yaml_parser_initialize")]
 		public Parser();
 
+		/*NOTE:
+		 * libyaml doesn't take an ownership reference of the string.
+		 * Make sure you keep the string alive during the lifetime of
+		 * the parser!
+		 *
+		 * size is in bytes, not in characters. Use string.size() to obtain
+		 * the size.
+		 * */
 		public void set_input_string(string input, size_t size);
-		public void set_intput_file(GLib.FileStream file);
+		/*NOTE:
+		 * libyaml doesn't take an ownership reference of the stream.
+		 * Make sure you keep the stream alive during the lifetime of
+		 * the parser!
+		 * */
+		public void set_input_file(GLib.FileStream file);
 		public void set_encoding(YAML.EncodingType encoding);
 		public bool parse(out YAML.Event event);
 	}

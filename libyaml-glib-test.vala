@@ -33,10 +33,36 @@ comments:
     Billsmer @ 338-4338.
 
 """;
+bool use_internal = false;
+[CCode (array_length = false, array_null_terminated = true)]
+string[] filename = null;
+const OptionEntry[] options = {
+	{"internal", 'i', 0, OptionArg.NONE, ref use_internal, "Use the internal Yaml 1.1 example"},
+	{"",0, 0, OptionArg.FILENAME_ARRAY, ref filename, "the file to be parsed"}
+};
+
+FileStream stream = null;
+
 public int main(string[] args) {
+	OptionContext context = new OptionContext(" - test the parser");
+	context.add_main_entries (options, null);
+	context.parse(ref args);
+
 	Parser parser = Parser();
 	Event event;
-	parser.set_input_string(buffer, buffer.size());
+	
+	if(use_internal)
+		parser.set_input_string(buffer, buffer.size());
+	else if(filename != null) {
+		stream = FileStream.open(filename[0], "r");
+		assert(filename.length == 1);
+		assert(stream != null);
+	}
+	if(stream != null)
+		parser.set_input_file(stream);
+	else 
+		parser.set_input_file(stdin);
+
 	Document document = new Document.load(ref parser);
 	foreach(GLib.YAML.Node node in document.nodes) {
 		if(node is GLib.YAML.Node.Scalar) {
