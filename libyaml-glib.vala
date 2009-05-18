@@ -59,6 +59,23 @@ namespace GLib.YAML {
 		 */
 		public string anchor;
 
+		private void* pointer;
+		private DestroyNotify destroy_notify;
+		public void* get_pointer() {
+			return pointer;
+		}
+		public void set_pointer(void* pointer, DestroyNotify? notify = null) {
+			if(this.pointer != null && destroy_notify != null) {
+				destroy_notify(this.pointer);
+			}
+			this.pointer = pointer;
+			destroy_notify = notify;
+		}
+		~Node () {
+			if(this.pointer != null && destroy_notify != null) {
+				destroy_notify(this.pointer);
+			}
+		}
 		/**
 		 * An Alias Node
 		 *
