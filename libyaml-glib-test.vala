@@ -63,7 +63,7 @@ public int main(string[] args) {
 		parser.set_input_file(stdin);
 
 	try {
-		Document document = new Document.load(ref parser);
+		Document document = new Document.from_parser(ref parser);
 		foreach(GLib.YAML.Node node in document.nodes) {
 			if(node is GLib.YAML.Node.Scalar) {
 				message("node: %s", (node as GLib.YAML.Node.Scalar).value);

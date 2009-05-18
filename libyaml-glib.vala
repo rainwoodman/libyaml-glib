@@ -23,31 +23,73 @@
  ***/
 
 using YAML;
+/*
+ *
+ * The GLib binding of libyaml.
+ *
+ * libyaml is used for parsing and emitting events.
+ *
+ * A document model based on GType classes replaces the original libyaml
+ * document model.
+ * 
+ * [warning:
+ *  This is not a full implementation of a YAML document.
+ *  * The document tag directive is missing.
+ *  * Alias is not immediately resolved and replaced with the referred node.
+ * ]
+ */
 namespace GLib.YAML {
 	public errordomain Error {
 		PARSER_ERROR,
 		UNRESOLVED_ALIAS
 	}
+	/**
+	 * A YAML Node
+	 * */
 	public class Node {
 		public NodeType type;
 		public string tag;
 		public Mark start_mark;
 		public Mark end_mark;
-		/* NOTE:
-		 * anchor has meaning across Alias node and other node types.
+		/* 
+		 * The meanings of anchor differ for Alias node and other node types.
+		 *
+		 * For Alias it is the referring anchor,
+		 * For Scalar, Sequence, and Mapping, it is the real anchor.
 		 */
 		public string anchor;
+
+		/**
+		 * An Alias Node
+		 *
+		 * Refer to the YAML 1.1 spec for the definitions.
+		 * */
 		public class Alias:Node {
 			public Node node;
 		}
+		/**
+		 * A Scalar Node
+		 *
+		 * Refer to the YAML 1.1 spec for the definitions.
+		 */
 		public class Scalar:Node {
 			public string value;
 			public ScalarStyle style;
 		}
+		/**
+		 * A Sequence Node
+		 * 
+		 * Refer to the YAML 1.1 spec for the definitions.
+		 */
 		public class Sequence:Node {
 			public List<Node> items;
 			public SequenceStyle style;
 		}
+		/**
+		 * A Mapping Node
+		 * 
+		 * Refer to the YAML 1.1 spec for the definitions.
+		 */
 		public class Mapping:Node {
 			public HashTable<Node, Node> pairs 
 			= new HashTable<Node, Node>(direct_hash, direct_equal);
@@ -56,18 +98,43 @@ namespace GLib.YAML {
 			public MappingStyle style;
 		}
 	}
+	/**
+	 * A YAML Document
+	 *
+	 * Refer to the YAML 1.1 spec for the definitions.
+	 *
+	 */
 	public class Document {
+		/* List of nodes */
 		public List<Node> nodes;
 		public Mark start_mark;
 		public Mark end_mark;
+		/* Dictionary of anchors */
 		public HashTable<string, Node> anchors
 		= new HashTable<string, Node>(str_hash, str_equal);
-		public Document.load(ref Parser parser) throws Error {
+		
+		/**
+		 * Create a document from a parser
+		 * */
+		public Document.from_parser(ref Parser parser) throws Error {
 			Loader loader = new Loader();
+			loader.load(ref parser, this);
+		}
+
+		/**
+		 * Create a document from a string
+		 * */
+		public Document.from_string(string str) throws Error {
+			Loader loader = new Loader();
+			Parser parser = Parser();
+			parser.set_input_string(str, str.size());
 			loader.load(ref parser, this);
 		}
 	}
 
+	/**
+	 * Internal class used to load the document
+	 */
 	internal class Loader {
 		public Loader() {}
 		private void parse_with_throw(ref Parser parser, out Event event)
