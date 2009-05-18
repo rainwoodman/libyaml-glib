@@ -90,6 +90,10 @@ namespace YAML {
 		public size_t index;
 		public size_t line;
 		public size_t column;
+		public string to_string() {
+			return "index:%u line:%u column:%u".printf(
+				(uint)index, (uint)line, (uint)column);
+		}
 	}
 
 	[CCode (cname = "yaml_event_type_t", cprefix="YAML_", has_type_id = false)]

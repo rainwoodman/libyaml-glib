@@ -143,14 +143,12 @@ namespace GLib.YAML {
 				return;
 			}
 			string message =
-			("Parser encounters an error: %s at %u(index:%u line:%u column:%u)\n"
+			("Parser encounters an error: %s at %u(%s)\n"
 			+"Error Context: '%s'")
 			.printf(
 				parser.problem,
 				parser.problem_offset,
-				parser.problem_mark.index,
-				parser.problem_mark.line,
-				parser.problem_mark.column,
+				parser.problem_mark.to_string(),
 				parser.context
 			);
 			throw new Error.PARSER_ERROR(message);
