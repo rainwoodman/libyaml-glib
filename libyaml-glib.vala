@@ -76,6 +76,12 @@ namespace GLib.YAML {
 				destroy_notify(this.pointer);
 			}
 		}
+		public Node get_resolved() {
+			if(this is Alias) {
+				return (this as Alias).node.get_resolved();
+			}
+			return this;
+		}
 		/**
 		 * An Alias Node
 		 *
