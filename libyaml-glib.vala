@@ -152,6 +152,16 @@ namespace GLib.YAML {
 			parser.set_input_string(str, str.size());
 			loader.load(ref parser, this);
 		}
+
+		/**
+		 * Create a document from a file stream
+		 * */
+		public Document.from_file(FileStream file) throws Error {
+			Loader loader = new Loader();
+			Parser parser = Parser();
+			parser.set_input_file(file);
+			loader.load(ref parser, this);
+		}
 	}
 
 	/**
