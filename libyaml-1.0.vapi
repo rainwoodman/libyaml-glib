@@ -46,86 +46,69 @@ namespace YAML {
 		FOLDED_SCALAR_STYLE
 	}
 
-	/** Sequence styles. */
 	[CCode (prefix="YAML_", cname="yaml_sequence_style_t", has_type_id=false)]
+	/** 
+	 * Sequence styles 
+	 * */
 	public enum SequenceStyle{
-		/** Let the emitter choose the style. */
-		ANY_SEQUENCE_STYLE,
-		/** The block sequence style. */
+		ANY_SEQUENCE_STYLE ,
 		BLOCK_SEQUENCE_STYLE,
-		/** The flow sequence style. */
 		FLOW_SEQUENCE_STYLE
 	}
-	/** Mapping styles. */
+	/** 
+	 * Mapping styles. 
+	 * */
 	[CCode (prefix="YAML_", cname="yaml_mapping_style_t", has_type_id=false)]
 	public enum MappingStyle {
-		/** Let the emitter choose the style. */
 		ANY_MAPPING_STYLE,
-		/** The block mapping style. */
 		BLOCK_MAPPING_STYLE,
-		/** The flow mapping style. */
 		FLOW_MAPPING_STYLE
-		/*YAML_FLOW_SET_MAPPING_STYLE is not there*/
 	}
 
-	/** The version directive data. */
+	/** 
+	 * The version directive data. 
+	 * */
 	[CCode (cname="yaml_version_directive_t", has_type_id = false)]
 	public struct VersionDirective {
-		/** The major version number. */
 		public int major;
-		/** The minor version number. */
 		public int minor;
 	}
 
-	/** The tag directive data. */
+	/** 
+	 * The tag directive data. 
+	 * */
 	[CCode (cname = "yaml_tag_directive_t", has_type_id = false)]
 	public struct TagDirective {
-		/** The tag handle. */
 		public string handle;
-		/** The tag prefix. */
 		public string prefix;
 	}
 	[CCode (cname="yaml_mark_t", has_type_id = false)]
-	/** The pointer position. */
+	/** 
+	 * The pointer position. 
+	 * */
 	public struct Mark {
-		/** The position index. */
 		public size_t index;
-
-		/** The position line. */
 		public size_t line;
-
-		/** The position column. */
 		public size_t column;
 	}
 
 	[CCode (cname = "yaml_event_type_t", cprefix="YAML_", has_type_id = false)]
 	public enum EventType {
-		/** An empty event. */
 		NO_EVENT,
 
-		/** A STREAM-START event. */
 		STREAM_START_EVENT,
-		/** A STREAM-END event. */
 		STREAM_END_EVENT,
 
-		/** A DOCUMENT-START event. */
 		DOCUMENT_START_EVENT,
-		/** A DOCUMENT-END event. */
 		DOCUMENT_END_EVENT,
 
-		/** An ALIAS event. */
 		ALIAS_EVENT,
-		/** A SCALAR event. */
 		SCALAR_EVENT,
 
-		/** A SEQUENCE-START event. */
 		SEQUENCE_START_EVENT,
-		/** A SEQUENCE-END event. */
 		SEQUENCE_END_EVENT,
 
-		/** A MAPPING-START event. */
 		MAPPING_START_EVENT,
-		/** A MAPPING-END event. */
 		MAPPING_END_EVENT
 	}
 
@@ -150,20 +133,22 @@ namespace YAML {
 		public YAML.MappingStyle style;
 	}
 
+	/** 
+	 * The scalar parameters (for @c YAML_SCALAR_EVENT). 
+	 * */
 	[CCode (has_type_id = false)]
-	/** The scalar parameters (for @c YAML_SCALAR_EVENT). */
 	public struct EventScalar {
-		/** The anchor. */
+		/* The anchor. */
 		public unowned string anchor;
-		/** The tag. */
+		/* The tag. */
 		public unowned string tag;
-		/** The scalar value. */
+		/* The scalar value. */
 		public unowned string value;
-		/** The length of the scalar value. */
+		/* The length of the scalar value. */
 		public size_t length;
-		/** Is the tag optional for the plain style? */
+		/* Is the tag optional for the plain style? */
 		public int plain_implicit;
-		/** Is the tag optional for any non-plain style? */
+		/* Is the tag optional for any non-plain style? */
 		public int quoted_implicit;
 		public ScalarStyle style;
 	}
@@ -189,40 +174,41 @@ namespace YAML {
 		public Mark end_mark;
 	}
 
-	/** The stream encoding. */
+	/** 
+	 * The stream encoding. 
+	 * */
 	[CCode (cname = "yaml_encoding_t", cprefix="YAML_", has_type_id = false)]
 	public enum EncodingType {
-		/** Let the parser choose the encoding. */
+		/* Let the parser choose the encoding. */
 		ANY_ENCODING,
-		/** The default UTF-8 encoding. */
+		/* The default UTF-8 encoding. */
 		UTF8_ENCODING,
-		/** The UTF-16-LE encoding with BOM. */
+		/* The UTF-16-LE encoding with BOM. */
 		UTF16LE_ENCODING,
-		/** The UTF-16-BE encoding with BOM. */
+		/* The UTF-16-BE encoding with BOM. */
 		UTF16BE_ENCODING
 	}
 
 	/** Many bad things could happen with the parser and emitter. */
 	[CCode (cname="yaml_error_type_t", prefix="YAML_", has_type_id=false)]
 	public enum ErrorType {
-		/** No error is produced. */
 		NO_ERROR,
 
-		/** Cannot allocate or reallocate a block of memory. */
+		/* Cannot allocate or reallocate a block of memory. */
 		MEMORY_ERROR,
 
-		/** Cannot read or decode the input stream. */
+		/* Cannot read or decode the input stream. */
 		READER_ERROR,
-		/** Cannot scan the input stream. */
+		/* Cannot scan the input stream. */
 		SCANNER_ERROR,
-		/** Cannot parse the input stream. */
+		/* Cannot parse the input stream. */
 		PARSER_ERROR,
-		/** Cannot compose a YAML document. */
+		/* Cannot compose a YAML document. */
 		COMPOSER_ERROR,
 
-		/** Cannot write to the output stream. */
+		/* Cannot write to the output stream. */
 		WRITER_ERROR,
-		/** Cannot emit a YAML stream. */
+		/* Cannot emit a YAML stream. */
 		EMITTER_ERROR
 	}
 
@@ -244,7 +230,9 @@ namespace YAML {
 		[CCode (cname="yaml_parser_initialize")]
 		public Parser();
 
-		/*NOTE:
+		/*
+		 * Set the input to a string.
+		 *
 		 * libyaml doesn't take an ownership reference of the string.
 		 * Make sure you keep the string alive during the lifetime of
 		 * the parser!
@@ -253,7 +241,9 @@ namespace YAML {
 		 * the size.
 		 * */
 		public void set_input_string(string input, size_t size);
-		/*NOTE:
+		/*
+		 * Set the input to a file stream.
+		 *
 		 * libyaml doesn't take an ownership reference of the stream.
 		 * Make sure you keep the stream alive during the lifetime of
 		 * the parser!
