@@ -49,7 +49,6 @@ public int main(string[] args) {
 	context.parse(ref args);
 
 	Parser parser = Parser();
-	Event event;
 	
 	if(use_internal)
 		parser.set_input_string(buffer, buffer.size());
@@ -63,14 +62,18 @@ public int main(string[] args) {
 	else 
 		parser.set_input_file(stdin);
 
-	Document document = new Document.load(ref parser);
-	foreach(GLib.YAML.Node node in document.nodes) {
-		if(node is GLib.YAML.Node.Scalar) {
-			message("node: %s", (node as GLib.YAML.Node.Scalar).value);
+	try {
+		Document document = new Document.load(ref parser);
+		foreach(GLib.YAML.Node node in document.nodes) {
+			if(node is GLib.YAML.Node.Scalar) {
+				message("node: %s", (node as GLib.YAML.Node.Scalar).value);
+			}
+			if(node is GLib.YAML.Node.Alias) {
+				message("alias: %s", (node as GLib.YAML.Node.Alias).node.anchor);
+			}
 		}
-		if(node is GLib.YAML.Node.Alias) {
-			message("alias: %s", (node as GLib.YAML.Node.Alias).node.anchor);
-		}
+	} catch (GLib.Error e) {
+		message("error message: %s", e.message);
 	}
 	return 0;
 }

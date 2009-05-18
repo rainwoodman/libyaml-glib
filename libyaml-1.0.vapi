@@ -233,7 +233,7 @@ namespace YAML {
 	public struct Parser {
 		public YAML.ErrorType error;
 		public string problem;
-		public size_t problem_offet;
+		public size_t problem_offset;
 		public int problem_value;
 		public YAML.Mark problem_mark;
 		public string context;

@@ -24,6 +24,10 @@
 
 using YAML;
 namespace GLib.YAML {
+	public errordomain Error {
+		PARSER_ERROR,
+		UNRESOLVED_ALIAS
+	}
 	public class Node {
 		public NodeType type;
 		public string tag;
@@ -58,7 +62,7 @@ namespace GLib.YAML {
 		public Mark end_mark;
 		public HashTable<string, Node> anchors
 		= new HashTable<string, Node>(str_hash, str_equal);
-		public Document.load(ref Parser parser) {
+		public Document.load(ref Parser parser) throws Error {
 			Loader loader = new Loader();
 			loader.load(ref parser, this);
 		}
@@ -66,18 +70,37 @@ namespace GLib.YAML {
 
 	internal class Loader {
 		public Loader() {}
+		private void parse_with_throw(ref Parser parser, out Event event)
+		throws Error {
+			if(parser.parse(out event)) {
+				return;
+			}
+			string message =
+			("Parser encounters an error: %s at %u(index:%u line:%u column:%u)\n"
+			+"Error Context: '%s'")
+			.printf(
+				parser.problem,
+				parser.problem_offset,
+				parser.problem_mark.index,
+				parser.problem_mark.line,
+				parser.problem_mark.column,
+				parser.context
+			);
+			throw new Error.PARSER_ERROR(message);
+		}
 		private Document document;
-		public bool load(ref Parser parser, Document document) {
+		public bool load(ref Parser parser, Document document) 
+		throws Error {
 			this.document = document;
 			Event event;
 			/* Look for a StreamStart */
 			if(!parser.stream_start_produced) {
-				return_val_if_fail(parser.parse(out event), false);
+				parse_with_throw(ref parser, out event);
 				assert(event.type == EventType.STREAM_START_EVENT);
 			}
 			return_val_if_fail (!parser.stream_end_produced, true);
 
-			return_val_if_fail (parser.parse(out event), false);
+			parse_with_throw(ref parser, out event);
 			/* if a StreamEnd seen, return OK */
 			return_val_if_fail (event.type != EventType.STREAM_END_EVENT, true);
 
@@ -85,13 +108,13 @@ namespace GLib.YAML {
 			assert(event.type == EventType.DOCUMENT_START_EVENT);
 			document.start_mark = event.start_mark;
 
-			return_val_if_fail (parser.parse(out event), false);
+			parse_with_throw(ref parser, out event);
 			/* Load the first node. 
 			 * load_node with recursively load other nodes */
-			return_val_if_fail (load_node(ref parser, ref event)!=null, false);
+			load_node(ref parser, ref event);
 			
 			/* expecting for a DocumentEnd */
-			return_val_if_fail (parser.parse(out event), false);
+			parse_with_throw(ref parser, out event);
 			assert(event.type == EventType.DOCUMENT_END_EVENT);
 			document.end_mark = event.end_mark;
 			
@@ -103,11 +126,15 @@ namespace GLib.YAML {
 				if(!(node is Node.Alias)) continue;
 				var alias_node = node as Node.Alias;
 				alias_node.node = document.anchors.lookup(alias_node.anchor);
-				return_val_if_fail (alias_node.node != null, false);
+				if(alias_node != null) continue;
+				string message = "Alias '%s' cannot be resolved."
+					.printf(alias_node.anchor);
+				throw new Error.UNRESOLVED_ALIAS(message);
 			}
 			return true;
 		}
-		public Node load_node(ref Parser parser, ref Event last_event) {
+		public Node load_node(ref Parser parser, ref Event last_event) 
+		throws Error {
 			switch(last_event.type) {
 				case EventType.ALIAS_EVENT:
 					return load_alias(ref parser, ref last_event);
@@ -121,7 +148,8 @@ namespace GLib.YAML {
 					assert_not_reached();
 			}
 		}
-		public Node? load_alias(ref Parser parser, ref Event event) {
+		public Node? load_alias(ref Parser parser, ref Event event)
+		throws Error {
 			Node.Alias node = new Node.Alias();
 			node.anchor = event.data.alias.anchor;
 
@@ -133,13 +161,15 @@ namespace GLib.YAML {
 
 			return node;
 		}
-		private static string normalize_tag(string? tag, string @default) {
+		private static string normalize_tag(string? tag, string @default)
+		throws Error {
 			if(tag == null || tag == "!") {
 				return @default;
 			}
 			return tag;
 		}
-		public Node? load_scalar(ref Parser parser, ref Event event) {
+		public Node? load_scalar(ref Parser parser, ref Event event)
+		throws Error {
 			Node.Scalar node = new Node.Scalar();
 			node.anchor = event.data.scalar.anchor;
 			node.tag = normalize_tag(event.data.scalar.tag,
@@ -156,7 +186,8 @@ namespace GLib.YAML {
 				document.anchors.insert(node.anchor, node);
 			return node;
 		}
-		public Node? load_sequence(ref Parser parser, ref Event event) {
+		public Node? load_sequence(ref Parser parser, ref Event event)
+		throws Error {
 			Node.Sequence node = new Node.Sequence();
 			node.anchor = event.data.sequence_start.anchor;
 			node.tag = normalize_tag(event.data.sequence_start.tag,
@@ -172,12 +203,12 @@ namespace GLib.YAML {
 				document.anchors.insert(node.anchor, node);
 
 			/* Load the items in the sequence */
-			return_val_if_fail (parser.parse(out event), null);
+			parse_with_throw(ref parser, out event);
 			while(event.type != EventType.SEQUENCE_END_EVENT) {
 				Node item = load_node(ref parser, ref event);
 				/* prepend is faster than append */
 				node.items.prepend(item);
-				return_val_if_fail (parser.parse(out event), null);
+				parse_with_throw(ref parser, out event);
 			}
 			/* Preserve the document order */
 			node.items.reverse();
@@ -187,7 +218,8 @@ namespace GLib.YAML {
 			node.end_mark = event.end_mark;
 			return node;
 		}
-		public Node? load_mapping(ref Parser parser, ref Event event) {
+		public Node? load_mapping(ref Parser parser, ref Event event)
+		throws Error {
 			Node.Mapping node = new Node.Mapping();
 			node.tag = normalize_tag(event.data.mapping_start.tag,
 					DEFAULT_MAPPING_TAG);
@@ -203,16 +235,14 @@ namespace GLib.YAML {
 				document.anchors.insert(node.anchor, node);
 
 			/* Load the items in the mapping */
-			return_val_if_fail (parser.parse(out event), null);
+			parse_with_throw(ref parser, out event);
 			while(event.type != EventType.MAPPING_END_EVENT) {
 				Node key = load_node(ref parser, ref event);
-				return_val_if_fail(key!=null, null);
-				return_val_if_fail (parser.parse(out event), null);
+				parse_with_throw(ref parser, out event);
 				Node value = load_node(ref parser, ref event);
-				return_val_if_fail(value!=null, null);
 				node.pairs.insert(key, value);
 				node.pairs_reverted.insert(value, key);
-				return_val_if_fail (parser.parse(out event), null);
+				parse_with_throw(ref parser, out event);
 			}
 			/* move the end mark of the mapping
 			 * to the END_MAPPING_EVENT */
