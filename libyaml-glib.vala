@@ -110,8 +110,7 @@ namespace GLib.YAML {
 		public class Mapping:Node {
 			public HashTable<Node, Node> pairs 
 			= new HashTable<Node, Node>(direct_hash, direct_equal);
-			public HashTable<Node, Node> pairs_reverted
-			= new HashTable<Node, Node>(direct_hash, direct_equal);
+			public List<Node> keys;
 			public MappingStyle style;
 		}
 	}
@@ -129,7 +128,7 @@ namespace GLib.YAML {
 		/* Dictionary of anchors */
 		public HashTable<string, Node> anchors
 		= new HashTable<string, Node>(str_hash, str_equal);
-		
+		public Node root;
 		/**
 		 * Create a document from a parser
 		 * */
@@ -193,7 +192,7 @@ namespace GLib.YAML {
 			parse_with_throw(ref parser, out event);
 			/* Load the first node. 
 			 * load_node with recursively load other nodes */
-			load_node(ref parser, ref event);
+			document.root = load_node(ref parser, ref event);
 			
 			/* expecting for a DocumentEnd */
 			parse_with_throw(ref parser, out event);
@@ -323,9 +322,12 @@ namespace GLib.YAML {
 				parse_with_throw(ref parser, out event);
 				Node value = load_node(ref parser, ref event);
 				node.pairs.insert(key, value);
-				node.pairs_reverted.insert(value, key);
+				node.keys.prepend(key);
 				parse_with_throw(ref parser, out event);
 			}
+			/* Preserve the document order */
+			node.keys.reverse();
+
 			/* move the end mark of the mapping
 			 * to the END_MAPPING_EVENT */
 			node.end_mark = event.end_mark;
