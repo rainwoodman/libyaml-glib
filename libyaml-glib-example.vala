@@ -2,6 +2,7 @@ using YAML;
 using GLib.YAML;
 const string buffer =
 """
+# This is the YAML 1.1 example. The YAML 1.2 example fails.
 --- !<tag:clarkevans.com,2002:invoice>
 invoice: 34843
 date   : 2001-01-23

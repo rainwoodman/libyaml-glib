@@ -1,5 +1,7 @@
 /* ************
  *
+ * Copyright (C) 2009  Denis Tereshkin
+ * Copyright (C) 2009  Dmitriy Kuteynikov
  * Copyright (C) 2009  Yu Feng
  *
  * This library is free software; you can redistribute it and/or
@@ -19,8 +21,9 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
  *
  * Author:
- * 	Yu Feng <rainwoodman@gmail.com>
+ * 	Denis Tereshkin
  * 	Dmitriy Kuteynikov <kuteynikov@gmail.com>
+ * 	Yu Feng <rainwoodman@gmail.com>
  ***/
 
 [CCode (cprefix="YAML", cheader_filename="yaml.h", lower_case_cprefix="yaml_")]
