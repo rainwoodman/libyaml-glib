@@ -1,0 +1,4 @@
+*.vapi
+*.deps
+!libyaml-1.0.vapi
+libyaml-glib-example
