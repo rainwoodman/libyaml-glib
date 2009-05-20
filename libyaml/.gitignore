@@ -1,0 +1,5 @@
+tests/example*
+tests/run*
+!*.c
+!*.h
+config.h
