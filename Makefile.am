@@ -46,7 +46,7 @@ EXTRA_DIST = libyaml-1.0.vapi \
              example-ccode \
              autogen.sh
 
-DISTCLEANFILES = 
+DISTCLEANFILES =  \
                  libyaml-glib-1.0.gir \
                  doltcompile doltlibtool  \
                  libyaml-glib-1.0.pc
