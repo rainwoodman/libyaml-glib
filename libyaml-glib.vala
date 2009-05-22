@@ -247,10 +247,8 @@ namespace GLib.YAML {
 			node.anchor = event.data.alias.anchor;
 
 			/* Push the node to the document stack
-			 * and register the anchor */
+			 * Do not register the anchor because it is an alias */
 			document.nodes.prepend(node);
-			if(node.anchor != null)
-				document.anchors.insert(node.anchor, node);
 
 			return node;
 		}

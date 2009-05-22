@@ -51,6 +51,9 @@ namespace GLib.YAML {
 		 * Build a object according to a given type
 		 */
 		public Object build_object(GLib.YAML.Node node, Type type) throws GLib.Error {
+			if(node.get_pointer() != null) {
+				return (Object) node.get_pointer();
+			}
 			Object obj = bootstrap_object(node, type);
 			process_object_value_nodes(obj, node);
 			return obj;

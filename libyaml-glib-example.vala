@@ -67,10 +67,20 @@ public int main(string[] args) {
 		Document document = new Document.from_parser(ref parser);
 		foreach(GLib.YAML.Node node in document.nodes) {
 			if(node is GLib.YAML.Node.Scalar) {
-				message("node: %s", (node as GLib.YAML.Node.Scalar).value);
-			}
+				message("node:(%p) %s", node, (node as GLib.YAML.Node.Scalar).value);
+			} else
 			if(node is GLib.YAML.Node.Alias) {
-				message("alias: %s", (node as GLib.YAML.Node.Alias).node.anchor);
+				message("alias:(%p) %s -> %p", 
+					node,
+					(node as GLib.YAML.Node.Alias).node.anchor,
+					(node as GLib.YAML.Node.Alias).get_resolved()
+				);
+			} else 
+			if(node is GLib.YAML.Node.Mapping) {
+				message("mapping:(%p)", node);
+			} else 
+			if(node is GLib.YAML.Node.Sequence) {
+				message("sequence:(%p)", node);
 			}
 		}
 	} catch (GLib.Error e) {
