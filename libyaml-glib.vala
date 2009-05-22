@@ -39,10 +39,6 @@ using YAML;
  * ]
  */
 namespace GLib.YAML {
-	public errordomain Error {
-		PARSER_ERROR,
-		UNRESOLVED_ALIAS
-	}
 	/**
 	 * A YAML Node
 	 * */
