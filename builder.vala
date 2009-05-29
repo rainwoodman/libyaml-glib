@@ -26,6 +26,7 @@ using YAML;
 
 namespace GLib.YAML {
 	public class Builder : GLib.Object {
+		private static delegate bool ParseFunc(string foo, void* location);
 		private string prefix = null;
 		private HashTable<string, Object> anchors = new HashTable<string, Object>(str_hash, str_equal);
 		private List<Object> objects;
@@ -55,11 +56,11 @@ namespace GLib.YAML {
 				return (Object) node.get_pointer();
 			}
 			Object obj = bootstrap_object(node, type);
-			process_object_value_nodes(obj, node);
+			process_object_value_node(obj, node);
 			return obj;
 		}
 
-		internal string get_full_class_name(string class_name) {
+		private string get_full_class_name(string class_name) {
 			if(prefix != null)
 				return prefix + "." + class_name;
 			else
@@ -80,7 +81,7 @@ namespace GLib.YAML {
 		private void process_value_nodes() throws GLib.Error {
 			foreach(var obj in objects) {
 				var node = (GLib.YAML.Node)obj.get_data("node");
-				process_object_value_nodes(obj, node);
+				process_object_value_node(obj, node);
 			}
 			
 		}
@@ -122,25 +123,131 @@ namespace GLib.YAML {
 			}
 		}
 
-		private void process_object_value_nodes(Object obj, GLib.YAML.Node node) throws GLib.Error {
+		private void process_object_value_node(Object obj, GLib.YAML.Node node) throws GLib.Error {
 			Buildable buildable = obj as Buildable;
 			var mapping = node as GLib.YAML.Node.Mapping;
-			foreach(var key in mapping.keys) {
-				assert(key is GLib.YAML.Node.Scalar);
-				var scalar = key as GLib.YAML.Node.Scalar;
-				var value = mapping.pairs.lookup(key).get_resolved();
-				if(buildable.get_child_type_internal(this, scalar.value) != Type.INVALID) {
-					buildable.process_children(this, scalar.value, value);
+			foreach(var key_node in mapping.keys) {
+				weak string key = cast_to_scalar(key_node);
+				var value_node = mapping.pairs.lookup(key_node).get_resolved();
+				if(buildable.get_child_type_internal(this, key) != Type.INVALID) {
+					process_children(buildable, key, value_node);
 					continue;
 				}
-				ParamSpec pspec = ((ObjectClass)obj.get_type().class_peek()).find_property(scalar.value);
+				ParamSpec pspec = ((ObjectClass)obj.get_type().class_peek()).find_property(key);
 				if(pspec != null) {
-					buildable.process_property(this, pspec, value);
+					process_property(buildable, pspec, value_node);
 				} else {
-					buildable.custom_node(this, scalar.value, value);
+					buildable.custom_node(this, key, value_node);
 				}
 			}
 			
+		}
+		private void process_property(Buildable buildable, ParamSpec pspec, GLib.YAML.Node node) throws Error {
+
+			Value gvalue = Value(pspec.value_type);
+			if(pspec.value_type == typeof(int)) {
+				gvalue.set_int((int)cast_to_scalar(node).to_long());
+			} else
+			if(pspec.value_type == typeof(uint)) {
+				gvalue.set_uint((uint)cast_to_scalar(node).to_long());
+			} else
+			if(pspec.value_type == typeof(long)) {
+				gvalue.set_long(cast_to_scalar(node).to_long());
+			} else
+			if(pspec.value_type == typeof(ulong)) {
+				gvalue.set_ulong(cast_to_scalar(node).to_ulong());
+			} else
+			if(pspec.value_type == typeof(string)) {
+				gvalue.set_string(cast_to_scalar(node));
+			} else
+			if(pspec.value_type == typeof(float)) {
+				gvalue.set_float((float)cast_to_scalar(node).to_double());
+			} else
+			if(pspec.value_type == typeof(double)) {
+				gvalue.set_double(cast_to_scalar(node).to_double());
+			} else
+			if(pspec.value_type == typeof(bool)) {
+				gvalue.set_boolean(cast_to_scalar(node).to_bool());
+			} else
+			if(pspec.value_type == typeof(Type)) {
+				gvalue.set_gtype(Demangler.resolve_type(get_full_class_name(cast_to_scalar(node))));
+			} else
+			if(pspec.value_type.is_a(typeof(Object))) {
+				Object ref_obj = null;
+				if(node is Node.Scalar) {
+					ref_obj = get_object(cast_to_scalar(node));
+					if(ref_obj == null) {
+						string message = "Object '%s' not found".printf(cast_to_scalar(node));
+						throw new Error.OBJECT_NOT_FOUND(message);
+					}
+				}
+				if(node is GLib.YAML.Node.Mapping) {
+					ref_obj = build_object(node, pspec.value_type);
+				} else {
+					string message = "Donot know how to build the object for `%s' (%s)"
+					.printf(pspec.name,  node.start_mark.to_string());
+					throw new Error.OBJECT_NOT_FOUND(message);
+				}
+				gvalue.set_object(ref_obj);
+			} else
+			if(pspec.value_type.is_a(typeof(Boxed))) {
+				var strval = cast_to_scalar(node);
+				message("working on a boxed type %s <- %s", pspec.value_type.name(), strval);
+				void* symbol = Demangler.resolve_function(pspec.value_type.name(), "parse");
+				char[] memory = new char[65500];
+				ParseFunc func = (ParseFunc) symbol;
+				if(!func(strval, (void*)memory)) {
+					string message = "Failed to parse the boxed type %s at (%s)"
+					.printf(pspec.value_type.name(), node.start_mark.to_string());
+					throw new Error.UNEXPECTED_NODE(message);
+				}
+				gvalue.set_boxed(memory);
+			} else {
+				string message = "Unhandled property type %s".printf(pspec.value_type.name());
+				throw new Error.UNKNOWN_PROPERTY_TYPE(message);
+			}
+			buildable.set_property(pspec.name, gvalue);
+		}
+
+		private unowned string cast_to_scalar(GLib.YAML.Node node) throws Error {
+			var value_scalar = (node as GLib.YAML.Node.Scalar);
+			if(value_scalar == null) {
+				string message = "Expecting a Scalar (%s)"
+				.printf(node.start_mark.to_string());
+				throw new Error.UNEXPECTED_NODE(message);
+			}
+			return value_scalar.value;
+		}
+
+		private void process_internal_children(Buildable buildable, GLib.YAML.Node node) throws GLib.Error {
+			var children = node as GLib.YAML.Node.Mapping;
+			foreach(var key_node in children.keys) {
+				var key = cast_to_scalar(key_node);
+				var value_node = children.pairs.lookup(key_node).get_resolved();
+				Object child = buildable.get_internal_child(this, key);
+				if(child == null) {
+					var message = "Expecting an internal child `%s', found nothing (%s)"
+					.printf(key, node.start_mark.to_string());
+					throw new Error.OBJECT_NOT_FOUND(message);
+				}
+				process_object_value_node(child, value_node);
+			}
+		}
+
+		private void process_children(Buildable buildable, string type, GLib.YAML.Node node) throws GLib.Error {
+			if(type == "internals") {
+				process_internal_children(buildable, node);
+				return;
+			}
+			var children = node as GLib.YAML.Node.Sequence;
+			foreach(var item in children.items) {
+				var child = (Object) item.get_resolved().get_pointer();
+				if (child == null) {
+					var message = "Expecting an object, found nothing (%s)".printf(node.start_mark.to_string());
+					throw new Error.OBJECT_NOT_FOUND(message);
+				}
+				buildable.add_child(this, child, type);
+			}
 		}
 		/** 
 		 * if anchor == null, return the object built by the root node of the yaml file
