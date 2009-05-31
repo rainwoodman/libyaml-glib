@@ -27,43 +27,69 @@
  ***/
 
 using YAML;
-/*
- *
+/**
  * The GLib binding of libyaml.
  *
  * libyaml is used for parsing and emitting events.
  *
- * A document model based on GType classes replaces the original libyaml
- * document model.
- * 
- * [warning:
- *  This is not a full implementation of a YAML document.
- *  * The document tag directive is missing.
- *  * Alias is not immediately resolved and replaced with the referred node.
- * ]
  */
 namespace GLib.YAML {
 	/**
-	 * A YAML Node
+	 * A YAML Node.
+	 *
+	 * YAML supports three types of nodes. They are converted to
+	 * GTypes
+	 *
+	 *   [| ++YAML++ || ++GType++ |]
+	 *   [| Scalar || Node.Scalar |]
+	 *   [| Sequence || Node.Sequence |]
+	 *   [| Mapping || Node.Mapping |]
+	 *   [| Alias || Node.Alias |]
+	 *
+	 * Each node type utilizes the fundamental GLib types to store the
+	 * YAML data.
+	 *
+	 * A pointer can be binded to the node with get_pointer and set_pointer.
+	 * This pointer is used by GLib.YAML.Builder to hold the built object.
+	 *
 	 * */
 	public class Node {
 		public NodeType type;
+		/**
+		 * The tag of a node specifies its type.
+		 **/
 		public string tag;
+		/**
+		 * The start mark of the node in the YAML stream
+		 **/
 		public Mark start_mark;
+		/**
+		 * The end mark of the node in the YAML stream
+		 **/
 		public Mark end_mark;
-		/* 
-		 * The meanings of anchor differ for Alias node and other node types.
+		/**
+		 * The anchor or the alias.
 		 *
-		 * For Alias it is the referring anchor,
-		 * For Scalar, Sequence, and Mapping, it is the real anchor.
+		 * The meanings of anchor differ for Alias node and other node types.
+		 *  * For Alias it is the referring anchor,
+		 *  * For Scalar, Sequence, and Mapping, it is the real anchor.
 		 */
 		public string anchor;
 
 		private void* pointer;
 		private DestroyNotify destroy_notify;
+		/**
+		 * Obtain the stored pointer in the node
+		 */
 		public void* get_pointer() {
 			return pointer;
 		}
+		/**
+		 * Store a pointer to the node.
+		 * 
+		 * @param notify
+		 *   the function to be called when the pointer is freed
+		 */
 		public void set_pointer(void* pointer, DestroyNotify? notify = null) {
 			if(this.pointer != null && destroy_notify != null) {
 				destroy_notify(this.pointer);
@@ -71,11 +97,20 @@ namespace GLib.YAML {
 			this.pointer = pointer;
 			destroy_notify = notify;
 		}
+
 		~Node () {
 			if(this.pointer != null && destroy_notify != null) {
 				destroy_notify(this.pointer);
 			}
 		}
+
+		/**
+		 * Obtain the resolved node to which this node is referring.
+		 *
+		 * Alias nodes are collapsed. This is indeed a very important
+		 * function.
+		 *
+		 */
 		public Node get_resolved() {
 			if(this is Alias) {
 				return (this as Alias).node.get_resolved();
@@ -86,6 +121,12 @@ namespace GLib.YAML {
 		 * An Alias Node
 		 *
 		 * Refer to the YAML 1.1 spec for the definitions.
+		 *
+		 * Note that the explanation of alias
+		 * is different from the explanation of alias in standard YAML.
+		 * The resolution of aliases are deferred, allowing forward-
+		 * referring aliases; whereas in standard YAML, forward-referring
+		 * aliases is undefined.
 		 * */
 		public class Alias:Node {
 			public Node node;
@@ -94,6 +135,9 @@ namespace GLib.YAML {
 		 * A Scalar Node
 		 *
 		 * Refer to the YAML 1.1 spec for the definitions.
+		 *
+		 * The scalar value is internally stored as a string,
+		 * or `gchar*'.
 		 */
 		public class Scalar:Node {
 			public string value;
@@ -103,6 +147,8 @@ namespace GLib.YAML {
 		 * A Sequence Node
 		 * 
 		 * Refer to the YAML 1.1 spec for the definitions.
+		 *
+		 * The sequence is internally stored as a GList.
 		 */
 		public class Sequence:Node {
 			public List<Node> items;
@@ -112,6 +158,11 @@ namespace GLib.YAML {
 		 * A Mapping Node
 		 * 
 		 * Refer to the YAML 1.1 spec for the definitions.
+		 *
+		 * The mapping is internally stored as a GHashTable.
+		 *
+		 * An extra list of keys is stored to ease iterating overall
+		 * elements. GHashTable.get_keys is not available in GLib 2.12.
 		 */
 		public class Mapping:Node {
 			public HashTable<Node, Node> pairs 
@@ -125,6 +176,14 @@ namespace GLib.YAML {
 	 *
 	 * Refer to the YAML 1.1 spec for the definitions.
 	 *
+	 * The document model based on GType classes replaces the original libyaml
+	 * document model.
+	 *
+	 * [warning:
+	 *  This is not a full implementation of a YAML document.
+	 *  The document tag directive is missing.
+	 *  Alias is not immediately resolved and replaced with the referred node.
+	 * ]
 	 */
 	public class Document {
 		/* List of nodes */
@@ -186,6 +245,11 @@ namespace GLib.YAML {
 			throw new Error.PARSER_ERROR(message);
 		}
 		private Document document;
+		/**
+		 * Load a YAML stream from a Parser to a Document.
+		 *
+		 * Alias are looked up at the very end of the stage.
+		 */
 		public bool load(ref Parser parser, Document document) 
 		throws Error {
 			this.document = document;
@@ -230,6 +294,11 @@ namespace GLib.YAML {
 			}
 			return true;
 		}
+		/**
+		 * Load a node from a YAML Event.
+		 * 
+		 * @return the loaded node.
+		 */
 		public Node load_node(ref Parser parser, ref Event last_event) 
 		throws Error {
 			switch(last_event.type) {
@@ -349,4 +418,5 @@ namespace GLib.YAML {
 		}
 	}
 
+}
 }

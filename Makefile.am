@@ -16,7 +16,7 @@ include_HEADERS = libyaml-glib.h
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = libyaml-glib-1.0.pc
 
-BUILT_SOURCES = vala-ccode example-ccode
+BUILT_SOURCES = vala-ccode example-ccode vala-doc
 
 noinst_PROGRAMS = libyaml-glib-example
 libyaml_glib_example_SOURCES = libyaml-glib-example.c
@@ -34,6 +34,14 @@ vala-ccode: $(VALASOURCES) libyaml-1.0.vapi
 	echo libyaml-1.0 > libyaml-glib-1.0.deps
 	touch $@
 
+if ENABLE_VALADOC
+vala-doc: $(VALASOURCES) libyaml-1.0.vapi
+	$(VALADOC) -o Documentation --package-name libyaml-glib-1.0 $(VALASOURCES) libyaml-1.0.vapi --pkg gmodule-2.0
+	touch $@
+else
+vala-doc:
+	touch $@
+endif
 example-ccode: libyaml-glib-example.vala libyaml-glib-1.0.vapi libyaml-1.0.vapi
 	$(VALAC) -C libyaml-glib-example.vala libyaml-1.0.vapi libyaml-glib-1.0.vapi
 	touch $@
@@ -45,7 +53,8 @@ EXTRA_DIST = libyaml-1.0.vapi \
              libyaml-glib-1.0.deps \
              vala-ccode \
              example-ccode \
-             autogen.sh
+             autogen.sh \
+             Documentation
 
 DISTCLEANFILES =  \
                  libyaml-glib-1.0.gir \
