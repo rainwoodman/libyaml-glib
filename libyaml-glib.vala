@@ -1,6 +1,8 @@
 /* ************
  *
  * Copyright (C) 2009  Yu Feng
+ * Copyright (C) 2009  Denis Tereshkin
+ * Copyright (C) 2009  Dmitriy Kuteynikov
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -20,6 +22,8 @@
  *
  * Author:
  * 	Yu Feng <rainwoodman@gmail.com>
+ * 	Denis Tereshkin
+ * 	Dmitriy Kuteynikov <kuteynikov@gmail.com>
  ***/
 
 using YAML;

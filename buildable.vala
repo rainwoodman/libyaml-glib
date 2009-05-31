@@ -20,6 +20,9 @@
  *
  * Author:
  * 	Yu Feng <rainwoodman@gmail.com>
+ * 
+ * This work is sponsed by C.Y Liu at Indiana University Cyclotron Facility.
+ *
  ***/
 
 using YAML;
