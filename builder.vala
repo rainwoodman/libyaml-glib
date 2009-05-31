@@ -42,20 +42,19 @@ namespace GLib.YAML {
 	 * # Every mapping corresponding to an object is examined. 
 	 *   Each mapping key in the pairs is scanned to match the 
 	 *   rules discussed in the following text.
-	 *   # `internal'
-	 *     * Internal children are referred by their internal names, 
-	 *       in the mapping node referred by the keyword `internals', 
+	 *   # `internals'
+	 *     * Internal children are referred by their internal names.
 	 *       Buildables should implement 
 	 *       Buildable.get_internel_child which returns the child object.
 	 *   # `objects', and other custom children key
-	 *     * Child objects are supplied as a sequence node in the 
+	 *     * Every child is supplied as a sequence item in the 
 	 *       mapping value. Buildables should implement 
 	 *       Buildable.get_child_type which returns the GType of 
 	 *       the custom child for the given key scalar.
 	 *   # properties
-	 *     * The key of the mapping is used to match a property name 
-	 *       of the object. If found, the value of the mapping pair 
-	 *       is parsed to fill in the value.
+	 *     * The key of the mapping matched against a property name 
+	 *       of the object. If found, the value is parsed to fill 
+	 *       in the value.
 	 *     * If the property refers to an Object and the value node is 
 	 *       a mapping, a new object is created, and the object is 
 	 *       initialized by the supplied mapping.
@@ -210,14 +209,7 @@ namespace GLib.YAML {
 
 				message("%s", type.name());
 				Object obj = Object.new(type);
-				if(!(obj is Buildable)) {
-					string message = 
-					"Object type %s(%s) is not a buildable"
-					.printf(type.name(), node.start_mark.to_string());
-					throw new Error.NOT_A_BUILDABLE(message);
-				}
-				Buildable buildable = obj as Buildable;
-				buildable.set_name(node.anchor);
+				((Buildable*) obj)->set_name(node.anchor);
 				if(node.anchor != null) {
 					anchors.insert(node.anchor, obj);
 				}
@@ -233,26 +225,31 @@ namespace GLib.YAML {
 			}
 		}
 
+		private Type get_child_type(Object obj, string tag) {
+			if(tag == "objects") return typeof(Object);
+			if(tag == "internals") return typeof(Object);
+			return ((Buildable*)obj) ->get_child_type(this, tag);
+		}
+
 		private void process_object_value_node(Object obj, GLib.YAML.Node node) throws GLib.Error {
-			Buildable buildable = obj as Buildable;
 			var mapping = node as GLib.YAML.Node.Mapping;
 			foreach(var key_node in mapping.keys) {
 				weak string key = cast_to_scalar(key_node);
 				var value_node = mapping.pairs.lookup(key_node).get_resolved();
-				if(buildable.get_child_type_internal(this, key) != Type.INVALID) {
-					process_children(buildable, key, value_node);
+				if(get_child_type(obj, key) != Type.INVALID) {
+					process_children(obj, key, value_node);
 					continue;
 				}
 				ParamSpec pspec = ((ObjectClass)obj.get_type().class_peek()).find_property(key);
 				if(pspec != null) {
-					process_property(buildable, pspec, value_node);
+					process_property(obj, pspec, value_node);
 				} else {
-					buildable.custom_node(this, key, value_node);
+					((Buildable*) obj)->custom_node(this, key, value_node);
 				}
 			}
 			
 		}
-		private void process_property(Buildable buildable, ParamSpec pspec, GLib.YAML.Node node) throws Error {
+		private void process_property(Object obj, ParamSpec pspec, GLib.YAML.Node node) throws Error {
 
 			Value gvalue = Value(pspec.value_type);
 			if(pspec.value_type == typeof(int)) {
@@ -316,7 +313,7 @@ namespace GLib.YAML {
 				string message = "Unhandled property type %s".printf(pspec.value_type.name());
 				throw new Error.UNKNOWN_PROPERTY_TYPE(message);
 			}
-			buildable.set_property(pspec.name, gvalue);
+			obj.set_property(pspec.name, gvalue);
 		}
 
 		private unowned string cast_to_scalar(GLib.YAML.Node node) throws Error {
@@ -329,12 +326,12 @@ namespace GLib.YAML {
 			return value_scalar.value;
 		}
 
-		private void process_internal_children(Buildable buildable, GLib.YAML.Node node) throws GLib.Error {
+		private void process_internal_children(Object obj, GLib.YAML.Node node) throws GLib.Error {
 			var children = node as GLib.YAML.Node.Mapping;
 			foreach(var key_node in children.keys) {
 				var key = cast_to_scalar(key_node);
 				var value_node = children.pairs.lookup(key_node).get_resolved();
-				Object child = buildable.get_internal_child(this, key);
+				Object child = ((Buildable*) obj)->get_internal_child(this, key);
 				if(child == null) {
 					var message = "Expecting an internal child `%s', found nothing (%s)"
 					.printf(key, node.start_mark.to_string());
@@ -344,9 +341,9 @@ namespace GLib.YAML {
 			}
 		}
 
-		private void process_children(Buildable buildable, string type, GLib.YAML.Node node) throws GLib.Error {
+		private void process_children(Object obj, string type, GLib.YAML.Node node) throws GLib.Error {
 			if(type == "internals") {
-				process_internal_children(buildable, node);
+				process_internal_children(obj, node);
 				return;
 			}
 			var children = node as GLib.YAML.Node.Sequence;
@@ -356,7 +353,7 @@ namespace GLib.YAML {
 					var message = "Expecting an object, found nothing (%s)".printf(node.start_mark.to_string());
 					throw new Error.OBJECT_NOT_FOUND(message);
 				}
-				buildable.add_child(this, child, type);
+				((Buildable*)obj)->add_child(this, child, type);
 			}
 		}
 		/** 

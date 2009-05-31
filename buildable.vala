@@ -92,19 +92,6 @@ namespace GLib.YAML {
 		public virtual Type get_child_type(Builder builder, string tag) {
 			return Type.INVALID;
 		}
-		/** 
-		 * Internal function.
-		 *
-		 * To workaround a vala problem that 
-		 * the default interface implementation cannot be chained up.
-		 *
-		 * */
-		internal Type get_child_type_internal(Builder builder, string tag) {
-			if(tag == "objects") return typeof(Object);
-			if(tag == "internals") return typeof(Object);
-			return get_child_type(builder, tag);
-		}
-
 
 		/**
 		 * Processing the custom node.
