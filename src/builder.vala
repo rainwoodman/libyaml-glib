@@ -107,12 +107,19 @@ namespace GLib.YAML {
 	 *
 	 * */
 	public class Builder : GLib.Object {
+		private static Type enum_type;
 		private static delegate bool ParseFunc(string foo, void* location);
 		private string prefix = null;
 		private HashTable<string, Object> anchors = new HashTable<string, Object>(str_hash, str_equal);
 		private List<Object> objects;
 
 		private GLib.YAML.Document document;
+		private enum __enum {
+			FOO,
+		}
+		static construct {
+			enum_type = typeof(__enum).parent();
+		}
 		/**
 		 * Create a builder with the given prefix.
 		 **/
@@ -309,7 +316,11 @@ namespace GLib.YAML {
 					throw new Error.UNEXPECTED_NODE(message);
 				}
 				gvalue.set_boxed(memory);
-			} else {
+			}  else
+			if(pspec.value_type.is_a(enum_type)) {
+				gvalue.set_enum((int)cast_to_scalar(node).to_long());
+			}
+			else {
 				string message = "Unhandled property type %s".printf(pspec.value_type.name());
 				throw new Error.UNKNOWN_PROPERTY_TYPE(message);
 			}
