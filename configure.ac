@@ -1,9 +1,9 @@
 
 AC_PREREQ(2.59)
 AC_INIT([yaml-glib], [0.1], [rainwoodman@gmail.com])
-AC_CONFIG_MACRO_DIR([config])
-AC_CONFIG_AUX_DIR([config])
-AC_SUBST(ACLOCAL_AMFLAGS, "-I config")
+AC_CONFIG_MACRO_DIR([autotools])
+AC_CONFIG_AUX_DIR([autotools])
+AC_SUBST(ACLOCAL_AMFLAGS, "-I autotools")
 AC_CONFIG_HEADERS([config.h])
 AM_INIT_AUTOMAKE([1.9 foreign])
 
@@ -49,5 +49,10 @@ fi
 AC_SUBST(LIBYAML_CFLAGS)
 AC_SUBST(LIBYAML_LIBS)
 AM_CONDITIONAL(USE_BUILTIN_LIBYAML, [test x$use_builtin_libyaml == xyes])
-AC_CONFIG_FILES([Makefile libyaml-glib-1.0.pc])
+AC_CONFIG_FILES([
+libyaml-glib-1.0.pc
+Makefile
+src/Makefile
+tests/Makefile
+])
 AC_OUTPUT
