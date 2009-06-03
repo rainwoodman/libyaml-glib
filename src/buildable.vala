@@ -99,7 +99,7 @@ namespace GLib.YAML {
 		 * @param node
 		 *   the node. It is actually a GLib.YAML.Node.
 		 */
-		public virtual void custom_node(Builder builder, string tag, void* node) throws GLib.Error {
+		public virtual void custom_node(Builder builder, string tag, GLib.YAML.Node node) throws GLib.Error {
 			string message = "Property %s.%s not found".printf(get_type().name(), tag);
 			throw new Error.PROPERTY_NOT_FOUND(message);
 		}
