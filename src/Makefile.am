@@ -3,7 +3,7 @@ lib_LTLIBRARIES = libyaml-glib.la
 VALASOURCES = libyaml-glib.vala error.vala buildable.vala builder.vala
 libyaml_glib_la_SOURCES = $(VALASOURCES:.vala=.c) libyaml-glib-1.0.h
 libyaml_glib_la_CPPFLAGS = $(LIBYAML_CFLAGS) $(GLIB_CFLAGS)
-libyaml_glib_la_LIBADD = $(LIBYAML_LIBS) -lyaml $(GLIB_LIBS)
+libyaml_glib_la_LIBADD = $(LIBYAML_LIBS) $(GLIB_LIBS)
 libyaml_glib_la_LDFLAGS = -version-info 0:0:0 -release $(VERSION)
 
 include_HEADERS = libyaml-glib-1.0.h
@@ -28,12 +28,11 @@ vala-doc:
 endif
 
 EXTRA_DIST = libyaml-1.0.vapi \
-             $(VALA_SOURCES) \
+             $(VALASOURCES) \
              libyaml-glib-1.0.vapi \
              libyaml-glib-1.0.deps \
              vala-ccode \
              vala-doc \
-             autogen.sh \
              Documentation
 
 DISTCLEANFILES = 
