@@ -15,8 +15,8 @@ SUFFIXES = .vala .c
 BUILT_SOURCES = $(noinst_PROGRAMS:=.c)
 EXTRA_DIST = $(noinst_PROGRAMS:=.vala)
 
-check-local:
-	for i in $(noinst_PROGRAMS); do \
-		./$$i; \
-    done;
+#check-local:
+#	for i in $(noinst_PROGRAMS); do \
+#		./$$i; \
+#    done;
 
