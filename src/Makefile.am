@@ -28,6 +28,10 @@ vala-doc:
 	touch $@
 endif
 
+vapi_DATA = libyaml-glib-1.0.vapi libyaml-glib-1.0.deps
+vapidir=$(datadir)/vala/vapi
+include_HEADERS = libyaml-glib-1.0.h
+
 EXTRA_DIST = libyaml-1.0.vapi \
              $(VALASOURCES) \
              libyaml-glib-1.0.vapi \
