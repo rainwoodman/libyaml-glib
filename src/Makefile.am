@@ -24,6 +24,7 @@ vala-doc: $(VALASOURCES) libyaml-1.0.vapi
 	touch $@
 else
 vala-doc:
+	mkdir -p Documentation
 	touch $@
 endif
 
@@ -39,4 +40,5 @@ DISTCLEANFILES =
 
 MAINTAINERCLEANFILES = $(VALASOURCES:.vala=.c) libyaml-glib-1.0.h \
                        libyaml-glib-1.0.vapi \
-                       libyaml-glib-1.0.deps
+                       libyaml-glib-1.0.deps \
+                       Documentation
