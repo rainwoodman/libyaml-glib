@@ -233,9 +233,12 @@ namespace GLib.YAML {
 		}
 
 		private Type get_child_type(Object obj, string tag) {
-			if(tag == "objects") return typeof(Object);
-			if(tag == "internals") return typeof(Object);
-			return ((Buildable*)obj) ->get_child_type(this, tag);
+			Type type = ((Buildable*)obj) ->get_child_type(this, tag);
+			if(type == Type.INVALID) {
+				if(tag == "objects") return typeof(Object);
+				if(tag == "internals") return typeof(Object);
+			}
+			return type;
 		}
 
 		private void process_object_value_node(Object obj, GLib.YAML.Node node) throws GLib.Error {
@@ -359,7 +362,7 @@ namespace GLib.YAML {
 			}
 			var children = node as GLib.YAML.Node.Sequence;
 			foreach(var item in children.items) {
-				var child = (Object) item.get_resolved().get_pointer();
+				var child = build_object(item.get_resolved(), ((Buildable*)obj)->get_child_type(this, type));
 				if (child == null) {
 					var message = "Expecting an object, found nothing (%s)".printf(node.start_mark.to_string());
 					throw new Error.OBJECT_NOT_FOUND(message);

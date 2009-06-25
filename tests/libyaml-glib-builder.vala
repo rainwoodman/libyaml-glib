@@ -7,7 +7,7 @@ public class Object: GLib.Object, Buildable {
 		children.prepend((Object)child);
 	}
 	public Type get_child_type (Builder builder, string tag) {
-		if(tag == "children") {
+		if(tag == "objects") {
 			return typeof(Object);
 		}
 		return Type.INVALID;
@@ -19,13 +19,9 @@ public class Object: GLib.Object, Buildable {
 public const string yaml = """
 --- !Object &root
 objects:
-- !Object
-  tag : tag1
-- !Object
-  tag : tag2
-- !Object
-  tag : tag3
-children:
+- tag : tag1
+- tag : tag2
+- tag : tag3
 - tag : tag4
 ...
 """;
