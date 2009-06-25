@@ -378,9 +378,17 @@ namespace GLib.YAML {
 			if(anchor != null)
 			return anchors.lookup(anchor);
 			else 
-			return document.root.get_pointer() as Object;
+			return get_root_object();
 		}
 
+		/**
+		 * Obtain the root object created for the document
+		 *
+		 * @return the root object
+		 */
+		public Object? get_root_object() {
+			return document.root.get_pointer() as Object;
+		}
 		/**
 		 * Obtain a list of all objects created by the builder. The 
 		 * returned list should not be modified.
@@ -412,7 +420,7 @@ namespace GLib.YAML {
 		public static string demangle(string vala_name) {
 			StringBuilder sb = new StringBuilder("");
 
-			bool already_underscoped = false;
+			bool already_underscoped = true;
 			unowned string p0 = null;
 			unowned string p1 = vala_name;
 			unichar c0 = 0;
@@ -471,6 +479,7 @@ namespace GLib.YAML {
 			sb.append(Demangler.demangle(member_name));
 			string func_name = sb.str;
 			Module self = Module.open(null, 0);
+			message("%s", func_name);
 			if(!self.symbol(func_name, out symbol)) {
 				string message =
 				"Symbol %s.%s (%s) not found"
