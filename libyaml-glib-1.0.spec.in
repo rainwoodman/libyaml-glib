@@ -15,6 +15,14 @@ Requires:	glib2 >= 2.12
 %description
 Buliding GObject with YAML
 
+%package		devel
+Summary:		Header files
+Group:			Development
+Requires:		pkgconfig
+Requires:		libyaml-glib-1.0 = %{version}-%{release}
+%description	devel
+This package contains the files needed to write programs with libyaml-glib
+
 %prep
 %setup -q
 
@@ -27,19 +35,28 @@ make %{?_smp_mflags}
 %install
 rm -rf $RPM_BUILD_ROOT
 make install DESTDIR=$RPM_BUILD_ROOT
-rm $RPM_BUILD_ROOT/usr/lib/libyaml.la
-rm $RPM_BUILD_ROOT/usr/lib/libyaml-glib.la
+rm $RPM_BUILD_ROOT/%{_libdir}/libyaml.la
+rm $RPM_BUILD_ROOT/%{_libdir}/libyaml-glib.la
 
 %clean
 rm -rf $RPM_BUILD_ROOT
 
 
+
+
 %files
 %defattr(-,root,root,-)
 %doc
+%{_libdir}/
+%exclude %{_libdir}/pkgconfig
+%exclude %{_libdir}/debug
+
+%files			devel
+%defattr(-,root,root,-)
+%doc
+%{_datadir}/vala/vapi
 %{_includedir}
-%{_libdir}
-%{_datadir}/vala/vapi/*
+%{_libdir}/pkgconfig
 
 %changelog
 
