@@ -14,7 +14,9 @@ pkgconfig_DATA = libyaml-glib-1.0.pc
 DISTCLEANFILES =  \
                  doltcompile doltlibtool  \
                  libyaml-glib-1.0.pc
+doc_DATA = README
 
 EXTRA_DIST = \
 	autogen.sh \
-	libyaml-glib-1.0.spec
+	libyaml-glib-1.0.spec \
+	README

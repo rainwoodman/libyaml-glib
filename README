@@ -1,0 +1,48 @@
+yaml-glib - Building GObject from YAML
+
+Introduction
+===========
+yaml-glib is the GLib binding of libyaml, plus a GObject builder
+that understands YAML.
+
+Source
+=======
+  The source code is hosted at github:
+
+  $ git clone git://github.com/fengy-research/libyaml-glib.git
+
+  No released tarball is available currently.
+
+
+Dependencies
+============
+
+  glib2 >= 2.10            GLib and GObject 
+  valac >= 0.7.2           Vala compiler
+
+  libyaml == 0.1.2         YAML 1.1 parser
+    built into the source tree, considering its current availability.
+
+Install
+=======
+  The header files and libraries of libyaml are also installed.
+
+  1. Direct install (on most distributions)
+
+  $ ./autogen.sh --prefix=/usr
+  $ make
+  $ make install
+
+  2. Build RPM and install from the rpm
+
+  $ ./autogen.sh
+  $ make
+  $ make dist
+# The next step requires your rpmdevtree is properly setup
+  $ rpmbuild -ta yaml-glib-0.1.tar.gz
+
+Documentation
+=============
+  The documenation can be compiled from valadoc. If a valadoc 
+  compiler is available. No documentation is installed.
+

@@ -1,6 +1,6 @@
 Name:		@PACKAGE@
 Version:	@VERSION@
-Release:	1%{?dist}
+Release:	2%{?dist}
 Summary:	Building GObject with YAML
 
 Group:		Development
@@ -28,7 +28,7 @@ This package contains the files needed to write programs with libyaml-glib
 
 
 %build
-%configure --disable-static
+%configure --disable-static --with-builtin-libyaml=yes
 make %{?_smp_mflags}
 
 
@@ -37,6 +37,7 @@ rm -rf $RPM_BUILD_ROOT
 make install DESTDIR=$RPM_BUILD_ROOT
 rm $RPM_BUILD_ROOT/%{_libdir}/libyaml.la
 rm $RPM_BUILD_ROOT/%{_libdir}/libyaml-glib.la
+rm $RPM_BUILD_ROOT/%{_datadir}/doc/yaml-glib/README
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -46,7 +47,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(-,root,root,-)
-%doc
+%doc README
 %{_libdir}/
 %exclude %{_libdir}/pkgconfig
 %exclude %{_libdir}/debug
