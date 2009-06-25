@@ -22,8 +22,8 @@ PKG_CHECK_MODULES(GLIB, [glib-2.0 >= 2.10 gobject-2.0 >= 2.10 gmodule-2.0 >= 2.1
 AC_SUBST(GLIB_CFLAGS)
 AC_SUBST(GLIB_LIBS)
 
-AC_ARG_WITH(with_builtin_libyaml,
-	[ AS_HELP_STRING([--with-builtin-libyaml], [use the builtin libyaml]) ],
+AC_ARG_WITH(builtin-libyaml,
+	[AS_HELP_STRING([--with-builtin-libyaml], [use the builtin libyaml]) ],
 	[],
 	[with_builtin_libyaml=check]
 )
