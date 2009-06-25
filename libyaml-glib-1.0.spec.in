@@ -1,0 +1,45 @@
+Name:		@PACKAGE@
+Version:	@VERSION@
+Release:	1%{?dist}
+Summary:	Building GObject with YAML
+
+Group:		Development
+License:	LGPLv3
+URL:		http://github.com/fengy-research/
+Source0:	%{name}-%{version}.tar.gz
+BuildRoot:	%(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-XXXXXX)
+
+BuildRequires:	glib2-devel >= 2.12
+Requires:	glib2 >= 2.12
+
+%description
+Buliding GObject with YAML
+
+%prep
+%setup -q
+
+
+%build
+%configure --disable-static
+make %{?_smp_mflags}
+
+
+%install
+rm -rf $RPM_BUILD_ROOT
+make install DESTDIR=$RPM_BUILD_ROOT
+rm $RPM_BUILD_ROOT/usr/lib/libyaml.la
+rm $RPM_BUILD_ROOT/usr/lib/libyaml-glib.la
+
+%clean
+rm -rf $RPM_BUILD_ROOT
+
+
+%files
+%defattr(-,root,root,-)
+%doc
+%{_includedir}
+%{_libdir}
+%{_datadir}/vala/vapi/*
+
+%changelog
+

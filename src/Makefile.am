@@ -6,8 +6,6 @@ libyaml_glib_la_CPPFLAGS = $(LIBYAML_CFLAGS) $(GLIB_CFLAGS)
 libyaml_glib_la_LIBADD = $(LIBYAML_LIBS) $(GLIB_LIBS)
 libyaml_glib_la_LDFLAGS = -version-info 0:0:0 -release $(VERSION)
 
-include_HEADERS = libyaml-glib-1.0.h
-
 BUILT_SOURCES = vala-ccode vala-doc
 
 
