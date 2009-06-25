@@ -4,7 +4,7 @@ else
 SUBDIRS = src tests
 endif
 
-.PHONY: bootstrap
+.PHONY: bootstrap gen-ChangeLog
 bootstrap: maintainer-clean
 	./autogen.sh
 
@@ -18,5 +18,17 @@ doc_DATA = README
 
 EXTRA_DIST = \
 	autogen.sh \
+	gitlog-to-changelog \
 	libyaml-glib-1.0.spec \
 	README
+
+dist-hook: gen-ChangeLog
+gen_start_date = 2009-03-01
+
+gen-ChangeLog:
+	if test -d .git; then						\
+	  $(top_srcdir)/gitlog-to-changelog				\
+	    --since=$(gen_start_date) > $(distdir)/cl-t;		\
+	  rm -f $(distdir)/ChangeLog;					\
+	  mv $(distdir)/cl-t $(distdir)/ChangeLog;			\
+	fi

@@ -1,6 +1,6 @@
 Name:		@PACKAGE@
 Version:	@VERSION@
-Release:	2%{?dist}
+Release:	5%{?dist}
 Summary:	Building GObject with YAML
 
 Group:		Development
@@ -47,7 +47,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(-,root,root,-)
-%doc README
+%doc README ChangeLog
 %{_libdir}/
 %exclude %{_libdir}/pkgconfig
 %exclude %{_libdir}/debug

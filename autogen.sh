@@ -1,3 +1,11 @@
+#!/bin/sh
+
+srcdir=`dirname $0`
+test -z "$srcdir" && srcdir=.
+
+ORIGDIR=`pwd`
+cd $srcdir
+
 M4_BOOTSTRAPS="vala.m4 valadoc.m4 dolt.m4"
 M4_BOOTSTRAP_SRC_PATH=${M4_BOOTSTRAP_SRC_PATH:-../autotools}
 mkdir -p autotools
@@ -8,12 +16,19 @@ for i in $M4_BOOTSTRAPS; do
 		echo Warning: file $i is not found, set M4_BOOTSTRAP_SRC_PATH.
 	fi
 done;
-aclocal -I autotools
-libtoolize --force --automake
-autoheader
-automake --add-missing
-autoconf
-(cd libyaml; autoreconf -fvi;)
+
+touch ChangeLog || exit $?
+
+aclocal -I autotools || exit $?
+libtoolize --force --automake || exit $?
+autoheader || exit $?
+automake --add-missing || exit $?
+autoconf || exit $?
+(cd libyaml; autoreconf -vi;) || exit $?
+
+cd $ORIGDIR || exit $?
+
 if ! test x$1 == x--no-configure; then
 ./configure --enable-maintainer-mode $*
 fi;
+
