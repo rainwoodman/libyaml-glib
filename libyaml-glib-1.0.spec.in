@@ -19,7 +19,7 @@ Buliding GObject with YAML
 Summary:		Header files
 Group:			Development
 Requires:		pkgconfig
-Requires:		libyaml-glib-1.0 = %{version}-%{release}
+Requires:		yaml-glib = %{version}-%{release}
 %description	devel
 This package contains the files needed to write programs with libyaml-glib
 
