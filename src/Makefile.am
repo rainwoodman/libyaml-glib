@@ -26,7 +26,7 @@ vala-doc:
 	touch $@
 endif
 
-vapi_DATA = libyaml-glib-1.0.vapi libyaml-glib-1.0.deps
+vapi_DATA = libyaml-glib-1.0.vapi libyaml-glib-1.0.deps libyaml-1.0.vapi
 vapidir=$(datadir)/vala/vapi
 include_HEADERS = libyaml-glib-1.0.h
 
