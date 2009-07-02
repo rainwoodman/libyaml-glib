@@ -55,22 +55,22 @@ dnl endif
 dnl --------------------------------------------------------------------------
 
 AC_DEFUN([VALA_PROG_VALADOC],[
-  enable_valadoc=yes
+  enabled_valadoc=yes
   AC_ARG_ENABLE(
     [valadoc],
     AC_HELP_STRING([--enable-valadoc], [default is yes]),
-    [ test "x$enableval" == xno && enable_valadoc=yes ],
-    [ enable_valadoc=yes ])
+    [ test "x$enableval" == xno && enabled_valadoc=no ],
+    [ enabled_valadoc=yes ])
 
-  AS_IF([test "x$enable_valadoc" == xyes ],
+  AS_IF([test "x$enabled_valadoc" == xyes ],
     [ AC_PATH_PROG([VALADOC_BIN], [valadoc], [])
       AS_IF([ test -z "${VALADOC_BIN}" ],
         AC_MSG_WARN([No valadoc found. You will not be able to generate document files.]) 
-        enable_valadoc=no
+        enabled_valadoc=no
       )
     ])
 
-  AM_CONDITIONAL(ENABLE_VALADOC, [ test "x$enable_valadoc" == xyes ])
+  AM_CONDITIONAL(ENABLE_VALADOC, [ test "x$enabled_valadoc" == xyes ])
 
   AC_SUBST(VALADOC_BIN)
   VALADOC="$VALADOC_BIN --force \$(vala_default_vapi_dirs)"
