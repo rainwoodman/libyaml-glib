@@ -35,9 +35,9 @@ make %{?_smp_mflags}
 %install
 rm -rf $RPM_BUILD_ROOT
 make install DESTDIR=$RPM_BUILD_ROOT
-rm $RPM_BUILD_ROOT/%{_libdir}/libyaml.la
-rm $RPM_BUILD_ROOT/%{_libdir}/libyaml-glib.la
-rm $RPM_BUILD_ROOT/%{_datadir}/doc/yaml-glib/README
+rm -f $RPM_BUILD_ROOT/%{_libdir}/libyaml.la
+rm -f $RPM_BUILD_ROOT/%{_libdir}/libyaml-glib.la
+rm -f $RPM_BUILD_ROOT/%{_datadir}/doc/yaml-glib/README
 
 %clean
 rm -rf $RPM_BUILD_ROOT
