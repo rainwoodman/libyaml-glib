@@ -38,11 +38,30 @@ Install
   $ ./autogen.sh
   $ make
   $ make dist
-# The next step requires your rpmdevtree is properly setup
+
+The next step either requires your rpmdevtree is properly setup
   $ rpmbuild -ta yaml-glib-0.1.tar.gz
+
+Or you can build the rpm with `easybuild'
+  (obtained from http://github.com/fengy-research/easybuild)
+
+  $ easybuild -ba yaml-glib.spec
+
+And the built RPMs will be in the current directory:
+
+  $ ls *.rpm
+  yaml-glib-0.1-5.i386.rpm  yaml-glib-debuginfo-0.1-5.i386.rpm
+  yaml-glib-0.1-5.src.rpm   yaml-glib-devel-0.1-5.i386.rpm
+
+Install the package with
+  $ su -c 'rpm -U yaml-glib-0.1-5.i386.rpm \
+    yaml-glib-debuginfo-0.1-5.i386.rpm \
+    yaml-glib-devel-0.1-5.i386.rpm'
 
 Documentation
 =============
   The documenation can be compiled from valadoc. If a valadoc 
-  compiler is available. No documentation is installed.
+  compiler is available. No documentation is installed. It is recommended
+  to turn off the documentation with --disable-valadoc all the time until
+  valadoc is stable.
 
