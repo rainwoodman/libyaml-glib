@@ -16,6 +16,10 @@ AM_PROG_CC_C_O
 VALA_PROG_VALAC([0.7.2])
 VALA_PROG_VALADOC
 
+#docdir fix for autoconf 2.59
+docdir='${datarootdir}/doc/${PACKAGE_TARNAME}'
+AC_SUBST(docdir)
+
 PKG_PROG_PKG_CONFIG([0.21])
 
 PKG_CHECK_MODULES(GLIB, [glib-2.0 >= 2.10 gobject-2.0 >= 2.10 gmodule-2.0 >= 2.10])
