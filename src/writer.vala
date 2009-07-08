@@ -36,15 +36,39 @@ namespace GLib.YAML {
 	public class Writer {
 		public Writer() {}
 
+		StringBuilder sb = null;
 		public string write_object(Object object) throws Error {
-			Event event;
+			Event event = {0};
 			Emitter emitter = Emitter();
-			//event = Event.stream_start();
-			emitter.set_output(handler);
-			return "";
+			sb = new StringBuilder("");
+			sb.truncate(0);
+			emitter.set_output_file(stdout);
+
+			Event.stream_start_initialize(ref event, EncodingType.ANY_ENCODING);
+			emitter.emit(ref event);
+			Event.document_start_initialize(ref event);
+			emitter.emit(ref event);
+			Event.sequence_start_initialize(ref event);
+			emitter.emit(ref event);
+
+			string s = "shitttttttaoidjfoaijfpqoifqewoifqpwoifqwoij";
+			Event.scalar_initialize(ref event, null, null, (owned) s, 4);
+			emitter.emit(ref event);
+		
+			Event.sequence_end_initialize(ref event);
+			emitter.emit(ref event);
+			Event.document_end_initialize(ref event);
+			emitter.emit(ref event);
+			Event.stream_end_initialize(ref event);
+			emitter.emit(ref event);
+			Event.clean(ref event);
+			emitter.flush();
+			return sb.str;
 		}
-		public int handler(char[] string) {
+		public int handler(char[] buffer) {
+			message("shit");
+			sb.append_len((string)buffer, buffer.length);
 			return 0;
-			}
+		}
 	}
 }

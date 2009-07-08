@@ -165,11 +165,11 @@ namespace YAML {
 	[CCode (has_type_id = false)]
 	public struct EventScalar {
 		/* The anchor. */
-		public unowned string anchor;
+		public string anchor;
 		/* The tag. */
-		public unowned string tag;
+		public string tag;
 		/* The scalar value. */
-		public unowned string value;
+		public string value;
 		/* The length of the scalar value. */
 		public size_t length;
 		/* Is the tag optional for the plain style? */
@@ -193,36 +193,39 @@ namespace YAML {
 			destroy_function="yaml_event_delete")]
 	public struct Event {
 		[CCode (cname="yaml_stream_start_event_initialize")]
-		public Event.stream_start(YAML.EncodingType encoding);
+		public static int stream_start_initialize(ref YAML.Event event, YAML.EncodingType encoding);
 
 		[CCode (cname="yaml_stream_end_event_initialize")]
-		public Event.stream_end();
+		public static int stream_end_initialize(ref YAML.Event event);
 
 		[CCode (cname="yaml_document_start_event_initialize")]
-		public Event.document_start(void* version_directive = null, void* tag_directive_start = null, void* tag_directive_end = null,
+		public static int document_start_initialize(ref YAML.Event event, void* version_directive = null, void* tag_directive_start = null, void* tag_directive_end = null,
 		                            bool implicit = true);
 
 		[CCode (cname="yaml_document_end_event_initialize")]
-		public Event.document_end(bool implicit);
+		public static int document_end_initialize(ref YAML.Event event, bool implicit = true);
 
 		[CCode (cname="yaml_alias_event_initialize")]
-		public Event.alias(string anchor);
+		public static int alias_initialize(ref YAML.Event event, owned string anchor);
 
 		[CCode (cname="yaml_scalar_event_initialize")]
-		public Event.scalar(string? anchor, string? tag, string value, int length, 
+		public static int scalar_initialize(ref YAML.Event event, owned string? anchor, owned string? tag, owned string value, int length, 
 		                   bool plain_implicit = true, bool quoted_implicity = true, 
 		                   YAML.ScalarStyle style = YAML.ScalarStyle.ANY_SCALAR_STYLE );
 
 		[CCode (cname="yaml_sequence_start_event_initialize")]
-		public Event.sequence_start(string? anchor, string? tag, bool implicit, YAML.SequenceStyle style);
+		public static int sequence_start_initialize(ref YAML.Event event, owned string? anchor = null, owned string? tag = null, bool implicit = true, YAML.SequenceStyle style = YAML.SequenceStyle.ANY_SEQUENCE_STYLE);
 		[CCode (cname="yaml_sequence_end_event_initialize")]
-		public Event.sequence_end();
+		public static int sequence_end_initialize(ref YAML.Event event);
 
 		[CCode (cname="yaml_mapping_start_event_initialize")]
-		public Event.mapping_start(string? anchor, string? tag, bool implicit, YAML.MappingStyle style);
+		public static int mapping_start_initialize(ref YAML.Event event, owned string? anchor = null, owned string? tag = null, bool implicit = true, YAML.MappingStyle style = YAML.MappingStyle.ANY_MAPPING_STYLE);
 		[CCode (cname="yaml_mapping_end_event_initialize")]
-		public Event.mapping_end();
+		public static int mapping_end_initialize(ref YAML.Event event);
 
+		public static void clean(ref YAML.Event event) {
+			event.type = YAML.EventType.NO_EVENT;
+		}
 		public EventType type;
 		public YAML.EventData data;
 		public Mark start_mark;
@@ -317,6 +320,8 @@ namespace YAML {
 			lower_case_cprefix="yaml_emitter_", 
 			destroy_function="yaml_emitter_delete")]
 	public struct Emitter {
+		[CCode (cname="yaml_emitter_initialize")]
+		public Emitter();
 		/*
 		 * Set the output to a string.
 		 *
