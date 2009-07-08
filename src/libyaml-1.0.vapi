@@ -85,6 +85,16 @@ namespace YAML {
 		public string handle;
 		public string prefix;
 	}
+	/** Line break types. */
+
+	[CCode (prefix="YAML_", cname="yaml_break_t", has_type_id=false)]
+	public enum BreakType {
+		ANY_BREAK,
+		CR_BREAK,
+		LN_BREAK,
+		CRLN_BREAK
+	}
+
 	[CCode (cname="yaml_mark_t", has_type_id = false)]
 	/** 
 	 * The pointer position. 
@@ -258,6 +268,41 @@ namespace YAML {
 		public void set_input_file(GLib.FileStream file);
 		public void set_encoding(YAML.EncodingType encoding);
 		public bool parse(out YAML.Event event);
+	}
+
+	[CCode (has_type_id = false,
+			cname="yaml_emitter_t", 
+			lower_case_cprefix="yaml_emitter_", 
+			destroy_function="yaml_emitter_delete")]
+	public struct Emitter {
+		/*
+		 * Set the output to a string.
+		 *
+		 * libyaml doesn't take an ownership reference of the string.
+		 * Make sure you keep the string alive during the lifetime of
+		 * the emitter!
+		 *
+		 * size is in bytes, not in characters. Use string.size() to obtain
+		 * the size.
+		 * */
+		public void set_output_string(char[] input, size_t size, out size_t written);
+		/*
+		 * Set the output to a file stream.
+		 *
+		 * libyaml doesn't take an ownership reference of the stream.
+		 * Make sure you keep the stream alive during the lifetime of
+		 * the emitter!
+		 * */
+		public void set_output_file(GLib.FileStream file);
+
+		public void set_encoding(YAML.EncodingType encoding);
+		public void set_canonical(bool canonical);
+		public void set_indent(int indent);
+		public void set_width(int width);
+		public void set_unicode(bool unicode);
+		public void set_break(YAML.BreakType break);
+		public int emit(ref YAML.Event event);
+		public int flush();
 	}
 
 }
