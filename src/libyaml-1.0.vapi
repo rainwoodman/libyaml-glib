@@ -309,6 +309,9 @@ namespace YAML {
 		public bool parse(out YAML.Event event);
 	}
 
+	[CCode (instance_pos = 0, cname="yaml_write_handler_t")]
+	public delegate int WriteHandler(char[] buffer);
+
 	[CCode (has_type_id = false,
 			cname="yaml_emitter_t", 
 			lower_case_cprefix="yaml_emitter_", 
@@ -324,7 +327,7 @@ namespace YAML {
 		 * size is in bytes, not in characters. Use string.size() to obtain
 		 * the size.
 		 * */
-		public void set_output_string(char[] input, size_t size, out size_t written);
+		public void set_output_string(char[] input, out size_t written);
 		/*
 		 * Set the output to a file stream.
 		 *
@@ -333,6 +336,8 @@ namespace YAML {
 		 * the emitter!
 		 * */
 		public void set_output_file(GLib.FileStream file);
+
+		public void set_output(YAML.WriteHandler handler);
 
 		public void set_encoding(YAML.EncodingType encoding);
 		public void set_canonical(bool canonical);

@@ -110,4 +110,6 @@ public static void main(string[] args) {
 	b.add_from_string(buffer);
 	Invoice invoice = b.get_root_object() as Invoice;
 	stdout.printf("%s", invoice.summary());
+	Writer w = new Writer();
+	stdout.printf("%s", w.write_object(invoice));
 }

@@ -31,17 +31,20 @@ using YAML;
  */
 namespace GLib.YAML {
 	/**
-	 * Internal class used to write the document
+	 * Write an Object to a YAML string
 	 */
-	internal class Writer {
+	public class Writer {
 		public Writer() {}
 
-		private Document document;
-		public bool write(ref Emitter emitter, Document document) throws Error {
-			
-			this.document = document;
+		public string write_object(Object object) throws Error {
 			Event event;
-			return true;
+			Emitter emitter = Emitter();
+			//event = Event.stream_start();
+			emitter.set_output(handler);
+			return "";
 		}
+		public int handler(char[] string) {
+			return 0;
+			}
 	}
 }
