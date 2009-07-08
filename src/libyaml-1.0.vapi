@@ -32,6 +32,15 @@ namespace YAML {
 	public const string DEFAULT_SCALAR_TAG;
 	public const string DEFAULT_SEQUENCE_TAG;
 	public const string DEFAULT_MAPPING_TAG;
+	public const string NULL_TAG;
+	public const string BOOL_TAG;
+	public const string STR_TAG;
+	public const string INT_TAG;
+	public const string FLOAT_TAG;
+	public const string TIMESTAMP_TAG;
+	public const string SEQ_TAG;
+	public const string MAP_TAG;
+
 	[CCode (prefix="YAML_", cname="yaml_node_type_t", has_type_id=false)]
 	public enum NodeType {
 		NO_NODE,
@@ -185,10 +194,40 @@ namespace YAML {
 	public struct Event {
 		[CCode (cname="yaml_stream_start_event_initialize")]
 		public Event.stream_start(YAML.EncodingType encoding);
+
+		[CCode (cname="yaml_stream_end_event_initialize")]
+		public Event.stream_end();
+
+		[CCode (cname="yaml_document_start_event_initialize")]
+		public Event.document_start(void* version_directive = null, void* tag_directive_start = null, void* tag_directive_end = null,
+		                            bool implicit);
+
+		[CCode (cname="yaml_document_end_event_initialize")]
+		public Event.document_end(bool implicit);
+
+		[CCode (cname="yaml_alias_event_initialize")]
+		public Event.alias(string anchor);
+
+		[CCode (cname="yaml_scalar_event_initialize")]
+		public Event.scalar(string? anchor, string? tag, string value, int length, 
+		                   bool plain_implicit, bool quoted_implicity, 
+		                   YAML.ScalarStyle style );
+
+		[CCode (cname="yaml_sequence_start_event_initialize")]
+		public Event.sequence_start(string? anchor, string? tag, bool implicit, YAML.SequenceStyle style);
+		[CCode (cname="yaml_sequence_end_event_initialize")]
+		public Event.sequence_end();
+
+		[CCode (cname="yaml_mapping_start_event_initialize")]
+		public Event.mapping_start(string? anchor, string? tag, bool implicit, YAML.MappingStyle style);
+		[CCode (cname="yaml_mapping_end_event_initialize")]
+		public Event.mapping_end();
+
 		public EventType type;
 		public YAML.EventData data;
 		public Mark start_mark;
 		public Mark end_mark;
+
 	}
 
 	/** 
