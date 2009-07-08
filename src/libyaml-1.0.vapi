@@ -41,14 +41,14 @@ namespace YAML {
 	public const string SEQ_TAG;
 	public const string MAP_TAG;
 
-	[CCode (prefix="YAML_", cname="yaml_node_type_t", has_type_id=false)]
+	[CCode (cprefix="YAML_", cname="yaml_node_type_t", has_type_id=false)]
 	public enum NodeType {
 		NO_NODE,
 		SCALAR_NODE,
 		SEQUENCE_NODE,
 		MAPPING_NODE
 	}
-	[CCode (prefix="YAML_", cname="yaml_scalar_style_t", has_type_id=false)]
+	[CCode (cprefix="YAML_", cname="yaml_scalar_style_t", has_type_id=false)]
 	public enum ScalarStyle {
 		ANY_SCALAR_STYLE,
 		PLAIN_SCALAR_STYLE,
@@ -58,7 +58,7 @@ namespace YAML {
 		FOLDED_SCALAR_STYLE
 	}
 
-	[CCode (prefix="YAML_", cname="yaml_sequence_style_t", has_type_id=false)]
+	[CCode (cprefix="YAML_", cname="yaml_sequence_style_t", has_type_id=false)]
 	/** 
 	 * Sequence styles 
 	 * */
@@ -70,7 +70,7 @@ namespace YAML {
 	/** 
 	 * Mapping styles. 
 	 * */
-	[CCode (prefix="YAML_", cname="yaml_mapping_style_t", has_type_id=false)]
+	[CCode (cprefix="YAML_", cname="yaml_mapping_style_t", has_type_id=false)]
 	public enum MappingStyle {
 		ANY_MAPPING_STYLE,
 		BLOCK_MAPPING_STYLE,
@@ -96,7 +96,7 @@ namespace YAML {
 	}
 	/** Line break types. */
 
-	[CCode (prefix="YAML_", cname="yaml_break_t", has_type_id=false)]
+	[CCode (cprefix="YAML_", cname="yaml_break_t", has_type_id=false)]
 	public enum BreakType {
 		ANY_BREAK,
 		CR_BREAK,
@@ -200,7 +200,7 @@ namespace YAML {
 
 		[CCode (cname="yaml_document_start_event_initialize")]
 		public Event.document_start(void* version_directive = null, void* tag_directive_start = null, void* tag_directive_end = null,
-		                            bool implicit);
+		                            bool implicit = true);
 
 		[CCode (cname="yaml_document_end_event_initialize")]
 		public Event.document_end(bool implicit);
@@ -210,8 +210,8 @@ namespace YAML {
 
 		[CCode (cname="yaml_scalar_event_initialize")]
 		public Event.scalar(string? anchor, string? tag, string value, int length, 
-		                   bool plain_implicit, bool quoted_implicity, 
-		                   YAML.ScalarStyle style );
+		                   bool plain_implicit = true, bool quoted_implicity = true, 
+		                   YAML.ScalarStyle style = YAML.ScalarStyle.ANY_SCALAR_STYLE );
 
 		[CCode (cname="yaml_sequence_start_event_initialize")]
 		public Event.sequence_start(string? anchor, string? tag, bool implicit, YAML.SequenceStyle style);
