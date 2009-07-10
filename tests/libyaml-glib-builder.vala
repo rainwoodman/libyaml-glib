@@ -108,7 +108,7 @@ comments:
 public static void main(string[] args) {
 	Builder b = new Builder();
 	Invoice invoice = b.build_from_string(buffer) as Invoice;
-	stdout.printf("%s", invoice.summary());
+	//stdout.printf("%s", invoice.summary());
 	Writer w = new Writer();
-	stdout.printf("%s", w.write_object(invoice));
+	stdout.printf("%s", w.stream_write_object(invoice));
 }

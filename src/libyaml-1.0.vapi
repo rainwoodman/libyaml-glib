@@ -206,20 +206,20 @@ namespace YAML {
 		public static int document_end_initialize(ref YAML.Event event, bool implicit = true);
 
 		[CCode (cname="yaml_alias_event_initialize")]
-		public static int alias_initialize(ref YAML.Event event, owned string anchor);
+		public static int alias_initialize(ref YAML.Event event, string anchor);
 
 		[CCode (cname="yaml_scalar_event_initialize")]
-		public static int scalar_initialize(ref YAML.Event event, owned string? anchor, owned string? tag, owned string value, int length, 
+		public static int scalar_initialize(ref YAML.Event event, string? anchor, string? tag, string value, int length, 
 		                   bool plain_implicit = true, bool quoted_implicity = true, 
 		                   YAML.ScalarStyle style = YAML.ScalarStyle.ANY_SCALAR_STYLE );
 
 		[CCode (cname="yaml_sequence_start_event_initialize")]
-		public static int sequence_start_initialize(ref YAML.Event event, owned string? anchor = null, owned string? tag = null, bool implicit = true, YAML.SequenceStyle style = YAML.SequenceStyle.ANY_SEQUENCE_STYLE);
+		public static int sequence_start_initialize(ref YAML.Event event, string? anchor = null, string? tag = null, bool implicit = true, YAML.SequenceStyle style = YAML.SequenceStyle.ANY_SEQUENCE_STYLE);
 		[CCode (cname="yaml_sequence_end_event_initialize")]
 		public static int sequence_end_initialize(ref YAML.Event event);
 
 		[CCode (cname="yaml_mapping_start_event_initialize")]
-		public static int mapping_start_initialize(ref YAML.Event event, owned string? anchor = null, owned string? tag = null, bool implicit = true, YAML.MappingStyle style = YAML.MappingStyle.ANY_MAPPING_STYLE);
+		public static int mapping_start_initialize(ref YAML.Event event, string? anchor = null, string? tag = null, bool implicit = true, YAML.MappingStyle style = YAML.MappingStyle.ANY_MAPPING_STYLE);
 		[CCode (cname="yaml_mapping_end_event_initialize")]
 		public static int mapping_end_initialize(ref YAML.Event event);
 
