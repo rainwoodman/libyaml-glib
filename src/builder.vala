@@ -110,7 +110,7 @@ namespace GLib.YAML {
 		private static Type enum_type;
 		private static delegate bool ParseFunc(string foo, void* location);
 		private string prefix = null;
-		private HashTable<string, Object> anchors = new HashTable<string, Object>(str_hash, str_equal);
+		private HashTable<string, unowned Object> anchors = new HashTable<string, unowned Object>.full(str_hash, str_equal, g_free, null);
 		private List<Object> objects;
 
 		private GLib.YAML.Document document;
@@ -130,6 +130,7 @@ namespace GLib.YAML {
 		 * Add objects from a string
 		 **/
 		public void add_from_string(string str) throws GLib.Error {
+			warning("this function is deprecated.");
 			assert(document == null);
 			document = new GLib.YAML.Document.from_string(str);
 			bootstrap_objects(document);
@@ -139,10 +140,33 @@ namespace GLib.YAML {
 		 * Add objects from a file stream
 		 **/
 		public void add_from_file (FileStream file) throws GLib.Error {
+			warning("this function is deprecated.");
 			assert(document == null);
 			document = new GLib.YAML.Document.from_file(file);
 			bootstrap_objects(document);
 			process_value_nodes();
+		}
+
+		/**
+		 * Build an object from a given string
+		 **/
+		public Object? build_from_string(string str) throws GLib.Error {
+			document = null;
+			document = new GLib.YAML.Document.from_string(str);
+			bootstrap_objects(document);
+			process_value_nodes();
+			return get_root_object();
+		}
+
+		/**
+		 * Build an object from a given filestream
+		 **/
+		public Object? build_from_file(FileStream file) throws GLib.Error {
+			document = null;
+			document = new GLib.YAML.Document.from_file(file);
+			bootstrap_objects(document);
+			process_value_nodes();
+			return get_root_object();
 		}
 
 		/**
