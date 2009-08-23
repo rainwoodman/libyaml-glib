@@ -1,6 +1,6 @@
 
 AC_PREREQ(2.59)
-AC_INIT([yaml-glib], [0.1], [rainwoodman@gmail.com])
+AC_INIT([yaml-glib], [0.1.1], [rainwoodman@gmail.com])
 AC_CONFIG_MACRO_DIR([autotools])
 AC_CONFIG_AUX_DIR([autotools])
 AC_SUBST(ACLOCAL_AMFLAGS, "-I autotools")

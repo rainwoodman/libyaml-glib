@@ -331,7 +331,7 @@ namespace GLib.YAML {
 				}
 				gvalue.set_object(ref_obj);
 			} else
-			if(pspec.value_type.is_a(typeof(Boxed))) {
+			if(pspec.value_type.is_a(G_TYPE_BOXED)) {
 				var strval = cast_to_scalar(node);
 				message("working on a boxed type %s <- %s", pspec.value_type.name(), strval);
 				void* symbol = Demangler.resolve_function(pspec.value_type.name(), "parse");
