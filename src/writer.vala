@@ -135,8 +135,10 @@ namespace GLib.YAML {
 				}
 			} else
 			if(pspec.value_type.is_a(G_TYPE_BOXED)) {
-				string message = "Unhandled property type %s".printf(pspec.value_type.name());
-				throw new Error.UNKNOWN_PROPERTY_TYPE(message);
+				throw new Error.UNKNOWN_PROPERTY_TYPE(
+					"Unhandled property type %s",
+					pspec.value_type.name());
+
 			}  else
 			if(pspec.value_type.is_a(enum_type)) {
 				EnumClass eclass = (EnumClass) pspec.value_type.class_ref();
@@ -149,8 +151,9 @@ namespace GLib.YAML {
 				}
 			}
 			else {
-				string message = "Unhandled property type %s".printf(pspec.value_type.name());
-				throw new Error.UNKNOWN_PROPERTY_TYPE(message);
+				throw new Error.UNKNOWN_PROPERTY_TYPE(
+					"Unhandled property type %s",
+					pspec.value_type.name());
 			}
 			if(str != null) {
 				/* FIXME: str != null is not a good indicator,

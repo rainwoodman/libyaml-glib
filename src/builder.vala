@@ -238,7 +238,7 @@ namespace GLib.YAML {
 			try {
 				if(type == Type.INVALID) type = Demangler.resolve_type(real_name);
 
-				message("%s", type.name());
+				debug("creating object of type `%s'", type.name());
 				Object obj = Object.new(type);
 				((Buildable*) obj)->set_name(node.anchor);
 				if(node.anchor != null) {
@@ -249,10 +249,9 @@ namespace GLib.YAML {
 				objects.prepend(obj);
 				return obj;
 			} catch (Error.SYMBOL_NOT_FOUND e) {
-				string message =
-				"Type %s(%s) is not found".
-				printf(real_name, node.start_mark.to_string());
-				throw new Error.TYPE_NOT_FOUND(message);
+				throw new Error.TYPE_NOT_FOUND(
+					"Type %s(%s) is not found",
+					real_name, node.start_mark.to_string());
 			}
 		}
 
@@ -318,29 +317,32 @@ namespace GLib.YAML {
 				if(node is Node.Scalar) {
 					ref_obj = get_object(cast_to_scalar(node));
 					if(ref_obj == null) {
-						string message = "Object '%s' not found".printf(cast_to_scalar(node));
-						throw new Error.OBJECT_NOT_FOUND(message);
+						throw new Error.OBJECT_NOT_FOUND(
+							"Object '%s' not found",
+							cast_to_scalar(node));
 					}
 				}
 				if(node is GLib.YAML.Node.Mapping) {
 					ref_obj = build_object(node, pspec.value_type);
 				} else {
-					string message = "Donot know how to build the object for `%s' (%s)"
-					.printf(pspec.name,  node.start_mark.to_string());
-					throw new Error.OBJECT_NOT_FOUND(message);
+					throw new Error.OBJECT_NOT_FOUND(
+						"Donot know how to build the object for `%s' (%s)",
+						pspec.name,  
+						node.start_mark.to_string());
 				}
 				gvalue.set_object(ref_obj);
 			} else
 			if(pspec.value_type.is_a(G_TYPE_BOXED)) {
 				var strval = cast_to_scalar(node);
-				message("working on a boxed type %s <- %s", pspec.value_type.name(), strval);
+				debug("working on a boxed type %s <- %s", pspec.value_type.name(), strval);
 				void* symbol = Demangler.resolve_function(pspec.value_type.name(), "parse");
 				char[] memory = new char[65500];
 				ParseFunc func = (ParseFunc) symbol;
 				if(!func(strval, (void*)memory)) {
-					string message = "Failed to parse the boxed type %s at (%s)"
-					.printf(pspec.value_type.name(), node.start_mark.to_string());
-					throw new Error.UNEXPECTED_NODE(message);
+					throw new Error.UNEXPECTED_NODE(
+					"Failed to parse the boxed type %s at (%s)",
+					pspec.value_type.name(),
+					node.start_mark.to_string());
 				}
 				gvalue.set_boxed(memory);
 			}  else
@@ -348,8 +350,9 @@ namespace GLib.YAML {
 				gvalue.set_enum((int)cast_to_scalar(node).to_long());
 			}
 			else {
-				string message = "Unhandled property type %s".printf(pspec.value_type.name());
-				throw new Error.UNKNOWN_PROPERTY_TYPE(message);
+				throw new Error.UNKNOWN_PROPERTY_TYPE(
+					"Unhandled property type %s",
+					pspec.value_type.name());
 			}
 			obj.set_property(pspec.name, gvalue);
 		}
@@ -357,9 +360,9 @@ namespace GLib.YAML {
 		private unowned string cast_to_scalar(GLib.YAML.Node node) throws Error {
 			var value_scalar = (node as GLib.YAML.Node.Scalar);
 			if(value_scalar == null) {
-				string message = "Expecting a Scalar (%s)"
-				.printf(node.start_mark.to_string());
-				throw new Error.UNEXPECTED_NODE(message);
+				throw new Error.UNEXPECTED_NODE(
+					"Expecting a Scalar (%s)",
+					node.start_mark.to_string());
 			}
 			return value_scalar.value;
 		}
@@ -371,9 +374,9 @@ namespace GLib.YAML {
 				var value_node = children.pairs.lookup(key_node).get_resolved();
 				Object child = ((Buildable*) obj)->get_internal_child(this, key);
 				if(child == null) {
-					var message = "Expecting an internal child `%s', found nothing (%s)"
-					.printf(key, node.start_mark.to_string());
-					throw new Error.OBJECT_NOT_FOUND(message);
+					throw new Error.OBJECT_NOT_FOUND(
+					"Expecting an internal child `%s', found nothing (%s)",
+					key, node.start_mark.to_string());
 				}
 				process_object_value_node(child, value_node);
 			}
@@ -388,8 +391,9 @@ namespace GLib.YAML {
 			foreach(var item in children.items) {
 				var child = build_object(item.get_resolved(), ((Buildable*)obj)->get_child_type(this, type));
 				if (child == null) {
-					var message = "Expecting an object, found nothing (%s)".printf(node.start_mark.to_string());
-					throw new Error.OBJECT_NOT_FOUND(message);
+					throw new Error.OBJECT_NOT_FOUND(
+					"Expecting an object, found nothing (%s)",
+					node.start_mark.to_string());
 				}
 				((Buildable*)obj)->add_child(this, child, type);
 			}
@@ -506,12 +510,10 @@ namespace GLib.YAML {
 			sb.append(Demangler.demangle(member_name));
 			string func_name = sb.str;
 			Module self = Module.open(null, 0);
-			message("%s", func_name);
 			if(!self.symbol(func_name, out symbol)) {
-				string message =
-				"Symbol %s.%s (%s) not found"
-				.printf(class_name, member_name, func_name);
-				throw new Error.SYMBOL_NOT_FOUND(message);
+				throw new Error.SYMBOL_NOT_FOUND(
+					"Symbol %s.%s (%s) not found",
+					class_name, member_name, func_name);
 			}
 			return symbol;
 		}

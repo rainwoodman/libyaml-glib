@@ -40,16 +40,15 @@ namespace GLib.YAML {
 			if(parser.parse(out event)) {
 				return;
 			}
-			string message =
-			("Parser encounters an error: %s at %u(%s)\n"
-			+"Error Context: '%s'")
-			.printf(
+			throw new Error.PARSER_ERROR(
+			"Parser encounters an error: %s at %u(%s)\n"
+			+ "Error Context: '%s'",
 				parser.problem,
 				parser.problem_offset,
 				parser.problem_mark.to_string(),
-				parser.context
-			);
-			throw new Error.PARSER_ERROR(message);
+				parser.context);
+
+
 		}
 		private Document document;
 		/**
@@ -95,9 +94,9 @@ namespace GLib.YAML {
 				var alias_node = node as Node.Alias;
 				alias_node.node = document.anchors.lookup(alias_node.anchor);
 				if(alias_node != null) continue;
-				string message = "Alias '%s' cannot be resolved."
-					.printf(alias_node.anchor);
-				throw new Error.UNRESOLVED_ALIAS(message);
+				throw new Error.UNRESOLVED_ALIAS(
+					"Alias '%s' cannot be resolved.",
+					alias_node.anchor);
 			}
 			return true;
 		}

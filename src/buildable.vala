@@ -67,7 +67,7 @@ namespace GLib.YAML {
 		 *
 		 */
 		public virtual void add_child(Builder builder, Object child, string? type) throws GLib.Error {
-			message("Adding %s to %s", (child as Buildable).get_name(), this.get_name());
+			debug("Adding %s to %s", (child as Buildable).get_name(), this.get_name());
 		}
 
 		/**
@@ -100,8 +100,9 @@ namespace GLib.YAML {
 		 *   the node. It is actually a GLib.YAML.Node.
 		 */
 		public virtual void custom_node(Builder builder, string tag, GLib.YAML.Node node) throws GLib.Error {
-			string message = "Property %s.%s not found".printf(get_type().name(), tag);
-			throw new Error.PROPERTY_NOT_FOUND(message);
+			throw new Error.PROPERTY_NOT_FOUND(
+				"Property %s.%s not found",
+				get_type().name(), tag);
 		}
 	}
 }
