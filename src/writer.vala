@@ -112,6 +112,7 @@ namespace GLib.YAML {
 			} else
 			if(pspec.value_type == typeof(string)) {
 				str = value.dup_string();
+				if(str == null) str = "~";
 			} else
 			if(pspec.value_type == typeof(float)) {
 				str = value.get_float().to_string();
@@ -148,6 +149,8 @@ namespace GLib.YAML {
 				throw new Error.UNKNOWN_PROPERTY_TYPE(message);
 			}
 			if(str != null) {
+				/* FIXME: str != null is not a good indicator,
+				 * use a boolean like need_scalar or something !*/
 				if(null != str.chr(-1, '\n')) {
 					Event.scalar_initialize(ref event, null, null, str, (int)str.size(), true, true,
 						ScalarStyle.LITERAL_SCALAR_STYLE);

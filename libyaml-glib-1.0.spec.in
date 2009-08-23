@@ -1,6 +1,6 @@
 Name:		@PACKAGE@
 Version:	@VERSION@
-Release:	1%{?dist}
+Release:	2%{?dist}
 Summary:	Building GObject with YAML
 
 Group:		Development
