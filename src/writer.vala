@@ -127,8 +127,12 @@ namespace GLib.YAML {
 				str = value.get_gtype().name();
 			} else
 			if(pspec.value_type.is_a(typeof(Object))) {
+				if(value.get_object() != null) {
 				write_object(value.get_object());
 				str = null;
+				} else {
+					str = "~";
+				}
 			} else
 			if(pspec.value_type.is_a(G_TYPE_BOXED)) {
 				string message = "Unhandled property type %s".printf(pspec.value_type.name());
