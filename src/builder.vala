@@ -256,7 +256,7 @@ namespace GLib.YAML {
 		}
 
 		private Type get_child_type(Object obj, string tag) {
-			Type type = ((Buildable*)obj) ->get_child_type(tag);
+			Type type = ((Buildable*)obj) ->get_child_type(this, tag);
 			if(type == Type.INVALID) {
 				if(tag == "objects") return typeof(Object);
 				if(tag == "internals") return typeof(Object);
@@ -389,7 +389,7 @@ namespace GLib.YAML {
 			}
 			var children = node as GLib.YAML.Node.Sequence;
 			foreach(var item in children.items) {
-				var child = build_object(item.get_resolved(), ((Buildable*)obj)->get_child_type(type));
+				var child = build_object(item.get_resolved(), ((Buildable*)obj)->get_child_type(this, type));
 				if (child == null) {
 					throw new Error.OBJECT_NOT_FOUND(
 					"Expecting an object, found nothing (%s)",

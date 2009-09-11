@@ -16,15 +16,15 @@ public class Invoice: GLib.Object, Buildable {
 		products.prepend((Product)child);
 	}
 	private static const string[] tags = {"product"};
+	private static Type[] types= {typeof(Product)};
+
 	public unowned string[]? get_child_tags() {
 		return tags;
 	}
-	public Type get_child_type (string tag) {
-		if(tag == "product") {
-			return typeof(Product);
-		}
-		return Type.INVALID;
+	public unowned Type[]? get_child_types () {
+		return types;
 	}
+
 	public List<unowned Object>? get_children(string? tag) {
 		if(tag == "product") {
 			/*NOTE: List.copy doesn't copy the reference counts of internal objects This might

@@ -78,6 +78,9 @@ namespace GLib.YAML {
 			return null;
 		}
 
+		public virtual unowned Type[]? get_child_types() {
+			return null;
+		}
 		/**
 		 * Return a list of children of the given type.
 		 * @param type
@@ -107,8 +110,19 @@ namespace GLib.YAML {
 		 *
 		 * @return the GType or G_TYPE_INVALID, 
 		 *   if the tag is not a child_type tag.
+		 * @deprecated
 		 */
-		public virtual Type get_child_type(string tag) {
+		internal Type get_child_type(Builder builder, string tag) {
+			unowned string[] tags = get_child_tags();
+			unowned Type[] types = get_child_types();
+			/* if not so, there is a problem with your code */
+			assert(types.length == tags.length);
+			if(tags == null) return Type.INVALID;
+			for(int i = 0; i < tags.length; i++) {
+				if(tags[i] == tag) {
+					return types[i];
+				}
+			}
 			return Type.INVALID;
 		}
 

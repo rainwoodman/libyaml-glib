@@ -103,11 +103,12 @@ namespace GLib.YAML {
 			}
 			if(object is Buildable) {
 				Buildable buildable = object as Buildable;
-				unowned string[] child_tags = buildable.get_child_tags();
-				if(child_tags != null)
-					foreach(weak string tag in child_tags) {
-						write_children(buildable, tag);
-					}
+				unowned string[] tags = buildable.get_child_tags();
+				unowned Type[] types = buildable.get_child_types();
+				if(tags != null)
+				for(int i = 0; i < tags.length; i++) {
+					write_children(buildable, tags[i], types[i]);
+				}
 			}
 		
 			Event.mapping_end_initialize(ref event);
@@ -115,18 +116,17 @@ namespace GLib.YAML {
 			Event.clean(ref event);
 		}
 
-		private void write_children(Buildable buildable, string tag) throws Error {
+		private void write_children(Buildable buildable, string tag, Type type) throws Error {
 			Event event = {0};
 			Event.scalar_initialize(ref event, null, null, tag, (int)tag.size());
 			emitter.emit(ref event);
 
 			List<weak Object> children = buildable.get_children(tag);
 
-			Type child_type = buildable.get_child_type(tag);
 			Event.sequence_start_initialize(ref event);
 			emitter.emit(ref event);
 			foreach(weak Object child in children) {
-				if(child.get_type() != child_type)
+				if(child.get_type() != type)
 					write_object(child, true);
 				else
 					write_object(child, false);
