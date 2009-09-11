@@ -19,7 +19,6 @@ doc_DATA = README
 EXTRA_DIST = \
 	autogen.sh \
 	gitlog-to-changelog \
-	libyaml-glib-1.0.spec \
 	README
 
 dist-hook: gen-ChangeLog
