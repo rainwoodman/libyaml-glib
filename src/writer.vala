@@ -44,23 +44,24 @@ namespace GLib.YAML {
 			enum_type = typeof(__enum).parent();
 		}
 
-		StringBuilder sb = null;
+		private unowned StringBuilder sb = null;
 		Emitter emitter;
-		public string stream_write_object(Object object) throws Error {
+
+		public void stream_object(Object object, StringBuilder sb) throws Error {
 			Event event = {0};
-			sb = new StringBuilder("");
+			this.sb = sb;
 			sb.truncate(0);
 			emitter = Emitter();
 			emitter.set_output(handler);
 
 			Event.stream_start_initialize(ref event, EncodingType.ANY_ENCODING);
 			emitter.emit(ref event);
-			Event.document_start_initialize(ref event);
+			Event.document_start_initialize(ref event, null, null, null, false);
 			emitter.emit(ref event);
 			Event.clean(ref event);
 
 			try {
-				write_object(object);
+				write_object(object, true);
 			} catch (Error e) {
 				throw e;
 			} finally {
@@ -70,12 +71,17 @@ namespace GLib.YAML {
 				emitter.emit(ref event);
 				Event.clean(ref event);
 				emitter.flush();
+				this.sb = null;
 			}
-			return sb.str;
+			return;
 		}
-		private void write_object(Object object) throws Error {
+		private void write_object(Object object, bool write_type_tag = false) throws Error {
 			Event event = {0};
-			Event.mapping_start_initialize(ref event);
+			if(write_type_tag) {
+				Event.mapping_start_initialize(ref event, null, "!" + object.get_type().name(), false);
+			} else {
+				Event.mapping_start_initialize(ref event);
+			}
 			emitter.emit(ref event);
 
 			ObjectClass klass = (ObjectClass) object.get_type().class_ref();
@@ -127,9 +133,18 @@ namespace GLib.YAML {
 				str = value.get_gtype().name();
 			} else
 			if(pspec.value_type.is_a(typeof(Object))) {
-				if(value.get_object() != null) {
-				write_object(value.get_object());
-				str = null;
+				unowned Object child = value.get_object();
+				if(child!= null) {
+					if(child.get_type() != pspec.value_type) {
+						/* if the object type differs from the property
+						 * schema, assume we have a child class instance
+						 * therefore the type tag of this object is important
+						 * */
+						write_object(child, true);
+					} else {
+						write_object(child, false);
+					}
+					str = null;
 				} else {
 					str = "~";
 				}

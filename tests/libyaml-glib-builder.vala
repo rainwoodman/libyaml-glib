@@ -1,6 +1,7 @@
 using GLib.YAML;
 
 public class Invoice: GLib.Object, Buildable {
+	public string foo {get; set;}
 	public int invoice {get; set;}
 	public string date {get; set;}
 	public Contact bill_to {get; set;}
@@ -71,16 +72,19 @@ public class Address : Object, Buildable {
 	public string postal {get; set;}
 }
 
+public class MyAddress : Address {
+}
 const string buffer =
 """
 # This is the YAML 1.1 example. The YAML 1.2 example fails.
 --- !Invoice
+foo: ~
 invoice: 34843
 date   : 2001-01-23
 bill-to: &id001
     given  : Chris
     family : Dumars
-    address:
+    address: !MyAddress
         lines: |
             458 Walkman Dr.
             Suite #292
@@ -109,6 +113,9 @@ public static void main(string[] args) {
 	Builder b = new Builder();
 	Invoice invoice = b.build_from_string(buffer) as Invoice;
 	//stdout.printf("%s", invoice.summary());
+	invoice.foo = null;
 	Writer w = new Writer();
-	stdout.printf("%s", w.stream_write_object(invoice));
+	StringBuilder sb = new StringBuilder("");
+	w.stream_object(invoice, sb);
+	stdout.printf("%s", sb.str);
 }
