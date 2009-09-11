@@ -15,11 +15,23 @@ public class Invoice: GLib.Object, Buildable {
 	public void add_child(Builder builder, GLib.Object child, string? type) throws GLib.Error {
 		products.prepend((Product)child);
 	}
-	public Type get_child_type (Builder builder, string tag) {
+	private static const string[] tags = {"product"};
+	public unowned string[]? get_child_tags() {
+		return tags;
+	}
+	public Type get_child_type (string tag) {
 		if(tag == "product") {
 			return typeof(Product);
 		}
 		return Type.INVALID;
+	}
+	public List<unowned Object>? get_children(string? tag) {
+		if(tag == "product") {
+			/*NOTE: List.copy doesn't copy the reference counts of internal objects This might
+			 * change in the future!*/
+			return products.copy();
+		}
+		return null;
 	}
 	public string summary(StringBuilder? sb = null) {
 		StringBuilder sb_ref = null;
@@ -110,7 +122,7 @@ comments:
 
 """;
 public static void main(string[] args) {
-	Builder b = new Builder();
+	Builder b = new Builder(null);
 	Invoice invoice = b.build_from_string(buffer) as Invoice;
 	//stdout.printf("%s", invoice.summary());
 	invoice.foo = null;

@@ -71,6 +71,25 @@ namespace GLib.YAML {
 		}
 
 		/**
+		 * return a list of children types.
+		 * the returned array should not be freed/modified.
+		 * */
+		public virtual unowned string[]? get_child_tags() {
+			return null;
+		}
+
+		/**
+		 * Return a list of children of the given type.
+		 * @param type
+		 *      if type == null, all children should be returned.
+		 *
+		 * the returned List doesn't hold references to the children.
+		 * AKA, free the returned list but do not free the children.
+		 * */
+		public virtual List<unowned Object>? get_children(string? type) {
+			return null;
+		}
+		/**
 		 * obtain an internal child.
 		 *
 		 * An internal child created by the buildable itself. As a contrary,
@@ -89,7 +108,7 @@ namespace GLib.YAML {
 		 * @return the GType or G_TYPE_INVALID, 
 		 *   if the tag is not a child_type tag.
 		 */
-		public virtual Type get_child_type(Builder builder, string tag) {
+		public virtual Type get_child_type(string tag) {
 			return Type.INVALID;
 		}
 

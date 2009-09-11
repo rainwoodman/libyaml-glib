@@ -34,8 +34,11 @@ namespace GLib.YAML {
 	 * Write an Object to a YAML string
 	 */
 	public class Writer {
-		public Writer() {}
+		public Writer(string? prefix = null) {
+			this.prefix = prefix;
+		}
 
+		private string prefix = null;
 		private static Type enum_type;
 		private enum __enum {
 			FOO,
@@ -78,7 +81,15 @@ namespace GLib.YAML {
 		private void write_object(Object object, bool write_type_tag = false) throws Error {
 			Event event = {0};
 			if(write_type_tag) {
-				Event.mapping_start_initialize(ref event, null, "!" + object.get_type().name(), false);
+				string type_name = object.get_type().name();
+				if(prefix != null) {
+					if(type_name.has_prefix(prefix))
+						Event.mapping_start_initialize(ref event, null, "!" + type_name.offset(prefix.length), false);
+					else
+						error("Internal program error, trying to serialize a object that is not in current namespace(%s)", prefix);
+				} else {
+					Event.mapping_start_initialize(ref event, null, "!" + type_name, false);
+				}
 			} else {
 				Event.mapping_start_initialize(ref event);
 			}
@@ -90,12 +101,41 @@ namespace GLib.YAML {
 			foreach(unowned ParamSpec spec in specs) {
 				write_property(object, spec);
 			}
-
+			if(object is Buildable) {
+				Buildable buildable = object as Buildable;
+				unowned string[] child_tags = buildable.get_child_tags();
+				if(child_tags != null)
+					foreach(weak string tag in child_tags) {
+						write_children(buildable, tag);
+					}
+			}
 		
 			Event.mapping_end_initialize(ref event);
 			emitter.emit(ref event);
 			Event.clean(ref event);
 		}
+
+		private void write_children(Buildable buildable, string tag) throws Error {
+			Event event = {0};
+			Event.scalar_initialize(ref event, null, null, tag, (int)tag.size());
+			emitter.emit(ref event);
+
+			List<weak Object> children = buildable.get_children(tag);
+
+			Type child_type = buildable.get_child_type(tag);
+			Event.sequence_start_initialize(ref event);
+			emitter.emit(ref event);
+			foreach(weak Object child in children) {
+				if(child.get_type() != child_type)
+					write_object(child, true);
+				else
+					write_object(child, false);
+			}
+			Event.sequence_end_initialize(ref event);
+			emitter.emit(ref event);
+			Event.clean(ref event);
+		}
+
 		private void write_property(Object object, ParamSpec pspec) throws Error {
 			Event event = {0};
 			Event.scalar_initialize(ref event, null, null, pspec.name, (int)pspec.name.size());
