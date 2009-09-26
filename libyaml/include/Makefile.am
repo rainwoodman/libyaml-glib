@@ -1,7 +1,7 @@
 INCLUDES = yaml.h
 DOXYGEN_CFG = $(top_srcdir)/doc/doxygen.cfg
 
-nobase_include_HEADERS = $(INCLUDES)
+#nobase_include_HEADERS = $(INCLUDES)
 
 if DOXYGEN
 

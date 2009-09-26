@@ -1,7 +1,7 @@
-if USE_BUILTIN_LIBYAML
-SUBDIRS = libyaml src tests
-else
+if USE_INSTALLED_LIBYAML
 SUBDIRS = src tests
+else
+SUBDIRS = libyaml src tests
 endif
 
 .PHONY: bootstrap gen-ChangeLog
