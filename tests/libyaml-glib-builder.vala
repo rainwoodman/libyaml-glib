@@ -18,11 +18,8 @@ public class Invoice: GLib.Object, Buildable {
 	private static const string[] tags = {"product"};
 	private static Type[] types= {typeof(Product)};
 
-	public unowned string[]? get_child_tags() {
-		return tags;
-	}
-	public unowned Type[]? get_child_types () {
-		return types;
+	static construct {
+		Buildable.register_type(typeof(Invoice), tags, types);
 	}
 
 	public List<unowned Object>? get_children(string? tag) {

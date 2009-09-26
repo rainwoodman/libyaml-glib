@@ -71,15 +71,37 @@ namespace GLib.YAML {
 		}
 
 		/**
+		 * Register a type for buildable,
+		 * especially register the child types.
+		 * */
+		public static void register_type (
+			Type type,
+			string[] tags, Type[] types) {
+			g_type_set_qdata(type, Quark.from_string("buildable-child-tags"), tags);
+			g_type_set_qdata(type, Quark.from_string("buildable-child-tags-len"), (void*) tags.length);
+			g_type_set_qdata(type, Quark.from_string("buildable-child-types"), types);
+			g_type_set_qdata(type, Quark.from_string("buildable-child-types-len"), (void*) types.length);
+		}
+		/**
 		 * return a list of children types.
 		 * the returned array should not be freed/modified.
 		 * */
-		public virtual unowned string[]? get_child_tags() {
-			return null;
+		public unowned string[]? get_child_tags() {
+			void * pointer = g_type_get_qdata(this.get_type(), 
+				Quark.from_string("buildable-child-tags"));
+			unowned string[] tags = (string[]) pointer;
+			tags.length = (int) g_type_get_qdata(this.get_type(), 
+				Quark.from_string("buildable-child-tags-len"));
+			return tags;
 		}
 
-		public virtual unowned Type[]? get_child_types() {
-			return null;
+		public unowned Type[]? get_child_types() {
+			void * pointer = g_type_get_qdata(this.get_type(), 
+				Quark.from_string("buildable-child-types"));
+			unowned Type[] types = (Type[]) pointer;
+			types.length = (int) g_type_get_qdata(this.get_type(), 
+				Quark.from_string("buildable-child-types-len"));
+			return types;
 		}
 		/**
 		 * Return a list of children of the given type.
