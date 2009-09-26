@@ -26,21 +26,15 @@ PKG_CHECK_MODULES(GLIB, [glib-2.0 >= 2.10 gobject-2.0 >= 2.10 gmodule-2.0 >= 2.1
 AC_SUBST(GLIB_CFLAGS)
 AC_SUBST(GLIB_LIBS)
 
-AC_ARG_WITH(installed-libyaml,
-	[AS_HELP_STRING([--with-installed-libyaml], [use the exisiting libyaml]) ],
-	[
-		if test x$withval = xyes; then
-			PKG_CHECK_MODULES(LIBYAML, libyaml >= 1.2 )
-			use_installed_libyaml=yes;
-		fi;
-	],
-	[ use_installed_libyaml=no ]
-)
+
+WITH_INSTALLED([libyaml], [use_installed_libyaml])
 
 if test x$use_installed_libyaml = xno; then
 	AC_CONFIG_SUBDIRS([libyaml])
 	LIBYAML_CFLAGS='-I$(top_srcdir)/libyaml/include';
 	LIBYAML_LIBS='$(top_builddir)/libyaml/src/libyaml.la';
+else
+	PKG_CHECK_MODULES(LIBYAML, libyaml >= 1.2 )
 fi;
 
 AC_SUBST(LIBYAML_CFLAGS)
