@@ -225,4 +225,3 @@ namespace GLib.YAML {
 
 
 }
-}
