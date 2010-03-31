@@ -44,13 +44,6 @@ namespace GLib.YAML {
 		}
 
 		private string prefix = null;
-		private static Type enum_type;
-		private enum __enum {
-			FOO,
-		}
-		static construct {
-			enum_type = typeof(__enum).parent();
-		}
 
 		private unowned StringBuilder sb = null;
 		Emitter emitter;
