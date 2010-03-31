@@ -31,9 +31,14 @@ using YAML;
  */
 namespace GLib.YAML {
 	/**
-	 * Write an Object to a YAML string
+	 * Write an Object to a YAML string.
+	 *
+	 * For a BoxedType, implement a _to_string() member to
+	 * return a newly allocated string represention of the object.
 	 */
 	public class Writer {
+		[CCode (has_target = false)]
+		private delegate string StringFunc(void* boxed);
 		public Writer(string? prefix = null) {
 			this.prefix = prefix;
 		}
@@ -190,10 +195,18 @@ namespace GLib.YAML {
 				}
 			} else
 			if(pspec.value_type.is_a(Type.BOXED)) {
-				throw new Error.UNKNOWN_PROPERTY_TYPE(
-					"Unhandled property type %s",
-					pspec.value_type.name());
-
+				void* string_symbol = Demangler.resolve_function(pspec.value_type.name(), "to_string");
+				void* boxed_value = value.get_boxed();
+				if(boxed_value == null) {
+					str = "~";
+				} else {
+					StringFunc string_func = (StringFunc) string_symbol;
+					if(string_func == null)
+						throw new Error.UNKNOWN_PROPERTY_TYPE(
+							"Unhandled property type %s, to_string not found.",
+							pspec.value_type.name());
+					str = string_func(boxed_value);
+				}
 			}  else
 			if(pspec.value_type.is_a(Type.ENUM)) {
 				EnumClass eclass = (EnumClass) pspec.value_type.class_ref();
