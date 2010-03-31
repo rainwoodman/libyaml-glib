@@ -189,13 +189,13 @@ namespace GLib.YAML {
 					str = "~";
 				}
 			} else
-			if(pspec.value_type.is_a(G_TYPE_BOXED)) {
+			if(pspec.value_type.is_a(Type.BOXED)) {
 				throw new Error.UNKNOWN_PROPERTY_TYPE(
 					"Unhandled property type %s",
 					pspec.value_type.name());
 
 			}  else
-			if(pspec.value_type.is_a(enum_type)) {
+			if(pspec.value_type.is_a(Type.ENUM)) {
 				EnumClass eclass = (EnumClass) pspec.value_type.class_ref();
 				int e = value.get_enum();
 				unowned EnumValue evalue = eclass.get_value(e);

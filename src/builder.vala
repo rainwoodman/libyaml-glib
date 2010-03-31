@@ -107,7 +107,8 @@ namespace GLib.YAML {
 	 *
 	 * */
 	public class Builder : GLib.Object {
-		private static Type enum_type;
+		/*If a boxed type goes beyond this size, expect to crash */
+		private static const int MAX_BOXED_SIZE = 65500;
 		[CCode (has_target = false)]
 		private delegate bool ParseFunc(string foo, void* location);
 		private string prefix = null;
@@ -115,12 +116,6 @@ namespace GLib.YAML {
 		private List<Object> objects;
 
 		private GLib.YAML.Document document;
-		private enum __enum {
-			FOO,
-		}
-		static construct {
-			enum_type = typeof(__enum).parent();
-		}
 		/**
 		 * Create a builder with the given prefix.
 		 **/
@@ -328,11 +323,11 @@ namespace GLib.YAML {
 				}
 				gvalue.set_object(ref_obj);
 			} else
-			if(pspec.value_type.is_a(G_TYPE_BOXED)) {
+			if(pspec.value_type.is_a(Type.BOXED)) {
 				var strval = cast_to_scalar(node);
 				debug("working on a boxed type %s <- %s", pspec.value_type.name(), strval);
 				void* symbol = Demangler.resolve_function(pspec.value_type.name(), "parse");
-				char[] memory = new char[65500];
+				char[] memory = new char[MAX_BOXED_SIZE];
 				ParseFunc func = (ParseFunc) symbol;
 				if(!func(strval, (void*)memory)) {
 					throw new Error.UNEXPECTED_NODE(
@@ -342,7 +337,7 @@ namespace GLib.YAML {
 				}
 				gvalue.set_boxed(memory);
 			}  else
-			if(pspec.value_type.is_a(enum_type)) {
+			if(pspec.value_type.is_a(Type.ENUM)) {
 				gvalue.set_enum((int)cast_to_scalar(node).to_long());
 			}
 			else {
