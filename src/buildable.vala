@@ -76,9 +76,9 @@ namespace GLib.YAML {
 		 * */
 		public static void register_type (
 			Type type,
-			string[] tags, Type[] types) {
-			g_type_set_qdata(type, Quark.from_string("buildable-child-tags"), tags);
-			g_type_set_qdata(type, Quark.from_string("buildable-child-tags-len"), (void*) tags.length);
+			string[] child_tags, Type[] types) {
+			g_type_set_qdata(type, Quark.from_string("buildable-child-tags"), child_tags);
+			g_type_set_qdata(type, Quark.from_string("buildable-child-tags-len"), (void*) child_tags.length);
 			g_type_set_qdata(type, Quark.from_string("buildable-child-types"), types);
 			g_type_set_qdata(type, Quark.from_string("buildable-child-types-len"), (void*) types.length);
 		}

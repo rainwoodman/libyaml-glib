@@ -37,39 +37,45 @@ namespace GLib.YAML {
 	 * supplied as items in sequences.
 	 *
 	 * ++ Two Stages of Building ++
-	 * # An object is created for each mapping with a YAML tag that 
-	 *   corresponds to a valid GObject type.
-	 * # Every mapping corresponding to an object is examined. 
-	 *   Each mapping key in the pairs is scanned to match the 
-	 *   rules discussed in the following text.
+	 * # First stage, Bootstrap.
+	 *   an object is created for each mapping which has a YAML tag
+	 *   corresponding to a valid GObject type.
+	 * # Second stage, process values.
+	 *   For every object created in bootstrap, scan the value nodes
+	 *   for the corresponding mapping.
+	 *   The keys in the mapping are processed as follows:
 	 *   # `internals'
-	 *     * Internal children are referred by their internal names.
-	 *       Buildables should implement 
-	 *       Buildable.get_internel_child which returns the child object.
-	 *   # `objects', and other custom children key
-	 *     * Every child is supplied as a sequence item in the 
-	 *       mapping value. Buildables should implement 
-	 *       Buildable.get_child_type which returns the GType of 
-	 *       the custom child for the given key scalar.
-	 *   # properties
-	 *     * The key of the mapping matched against a property name 
-	 *       of the object. If found, the value is parsed to fill 
-	 *       in the value.
-	 *     * If the property refers to an Object and the value node is 
-	 *       a mapping, a new object is created, and the object is 
-	 *       initialized by the supplied mapping.
-	 *     * If the property refers to an Object and the value node is 
-	 *       an alias, the object referred by the alias is 
-	 *       assigned to the property.
-	 *     * If the property refers to a Boxed structure, 
-	 *       a temperory buffer of 65530 bytes is allocated, 
-	 *       and a parse function, conforming the gdk_color_parse 
-	 *       calling convention ([CCode (instance_pos = -1)] 
-	 *       is called to initialize the buffer with the value scalar.
+	 *     * Value: a mapping from internal child name to internal child.
+	 *     * Requirements:
+	 *         Buildable.get_internel_child() shall be implemented,
+	 *         returning the child object for a key.
+	 *   # `objects', other tags returned by get_child_tags.
+	 *     * Value: a sequence of mapping that describes children objects.
+	 *     * Requirements:
+	 *         Declare type in the static or class constructer
+	 *         with Buildable.register_type(type, child_tags, child_types);
+	 *   # otherwise, assumed to be a property name
+	 *     # Match with a property name of the object?
+	 *       Parse the value accordingly and fill in the object value.
+	 *       * If the property refers to an Object and the value node is
+	 *         a mapping, a new object is created, and the object is
+	 *         initialized by the supplied mapping.
+	 *       * If the property refers to an Object and the value node is
+	 *         an alias, the object referred by the alias is
+	 *         assigned to the property.
+	 *       * If the property type is a Boxed structure,
+	 *         look for "_new_from_string" or "_parse" symbol of the type.
+	 *         if _new_from_string is found, a new boxed element is created,
+	 *         and assigned to the object.
+	 *         otherwise, if _parse is found, a temperory buffer of 
+	 *         MAX_BOXED_SIZE bytes is allocated, and _parse is invoked to
+	 *         fill in the buffer.
+	 *       * _parse function conforms the calling convention of
+	 *       gdk_color_parse ([CCode (instance_pos = -1)]
 	 *   # signals
 	 *     * Signal connection is not currently supported, but planned.
 	 *   # custom nodes
-	 *     * If the key doesn't match to any of the priorly mentioned 
+	 *     * If the key doesn't match any of the priorly mentioned 
 	 *       catagories, Buildable.custom_node is invoked. 
 	 *     * If the buildable doesn't understand the node, 
 	 *       it should report a PROPERTY_NOT_FOUND error.
@@ -78,6 +84,7 @@ namespace GLib.YAML {
 	 *   Be aware that if the Boxed struct is larger than the temporary buffer, 
 	 *   there will be a memory corruption. Currently no good fix is found, 
 	 *   because GLib doesn't store the size of a Boxed type.
+	 *   Rule of thumb: Always implement _new_from_string(string)!
 	 * ]
 	 *
 	 * Here is an example of the YAML file, 
