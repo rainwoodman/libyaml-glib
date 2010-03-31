@@ -50,14 +50,14 @@ public class Invoice: GLib.Object, Buildable {
 			bill_to.address.lines,
 			bill_to.address.city,
 			bill_to.address.state.to_string(),
-			bill_to.address.postal);
+			bill_to.address.postal.code);
 		sb.append_printf("%s %s \n %s %s %s %s\n", 
 			ship_to.given,
 			ship_to.family,
 			ship_to.address.lines,
 			ship_to.address.city,
 			ship_to.address.state.to_string(),
-			ship_to.address.postal);
+			ship_to.address.postal.code);
 
 		return sb.str;
 	}
@@ -78,7 +78,18 @@ public class Address : Object, Buildable {
 	public string lines {get; set;}
 	public string city {get; set;}
 	public State state {get; set;}
-	public string postal {get; set;}
+	public Postal postal {get; set;}
+}
+public struct Postal {
+	public string code;
+	public static Postal* new_from_string(string str) {
+		Postal* p = malloc0(sizeof(Postal));
+		p->code = str;
+		return p;
+	}
+	public string to_string() {
+		return code;
+	}
 }
 [CCode (cprefix="")]
 public enum State {

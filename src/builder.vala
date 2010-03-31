@@ -335,11 +335,11 @@ namespace GLib.YAML {
 			if(pspec.value_type.is_a(Type.BOXED)) {
 				var strval = cast_to_scalar(node);
 				debug("working on a boxed type %s <- %s", pspec.value_type.name(), strval);
-				void* parse_symbol = Demangler.resolve_function(pspec.value_type.name(), "parse");
-				void* new_symbol = Demangler.resolve_function(pspec.value_type.name(), "new_from_string");
-				ParseFunc parse_func = (ParseFunc) parse_symbol;
-				NewFunc new_func = (NewFunc) new_symbol;
-				if(new_func != null) {
+				void* parse_symbol = null;
+				void* new_symbol = null ;
+				try {
+					new_symbol = Demangler.resolve_function(pspec.value_type.name(), "new_from_string");
+					NewFunc new_func = (NewFunc) new_symbol;
 					void* memory = new_func(strval);
 					if(memory == null) {
 						throw new Error.UNEXPECTED_NODE(
@@ -348,21 +348,24 @@ namespace GLib.YAML {
 						node.start_mark.to_string());
 					}
 					gvalue.set_boxed(memory);
-				} else
-				if(parse_func != null) {
-					char[] memory = new char[MAX_BOXED_SIZE];
-					if(!parse_func(strval, (void*)memory)) {
+				} catch (GLib.Error e) {
+					try {
+						parse_symbol = Demangler.resolve_function(pspec.value_type.name(), "parse");
+						ParseFunc parse_func = (ParseFunc) parse_symbol;
+						char[] memory = new char[MAX_BOXED_SIZE];
+						if(!parse_func(strval, (void*)memory)) {
+							throw new Error.UNEXPECTED_NODE(
+							"Failed to parse and fill a boxed type %s at (%s)",
+							pspec.value_type.name(),
+							node.start_mark.to_string());
+						}
+						gvalue.set_boxed(memory);
+					} catch (GLib.Error e) {
 						throw new Error.UNEXPECTED_NODE(
-						"Failed to parse and fill a boxed type %s at (%s)",
+						"Failed to handle a boxed type %s at (%s)",
 						pspec.value_type.name(),
 						node.start_mark.to_string());
 					}
-					gvalue.set_boxed(memory);
-				} else {
-					throw new Error.UNEXPECTED_NODE(
-					"Failed to handle a boxed type %s at (%s)",
-					pspec.value_type.name(),
-					node.start_mark.to_string());
 				}
 			}  else
 			if(pspec.value_type.is_a(Type.ENUM)) {
