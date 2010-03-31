@@ -108,7 +108,8 @@ namespace GLib.YAML {
 	 * */
 	public class Builder : GLib.Object {
 		private static Type enum_type;
-		private static delegate bool ParseFunc(string foo, void* location);
+		[CCode (has_target = false)]
+		private delegate bool ParseFunc(string foo, void* location);
 		private string prefix = null;
 		private HashTable<string, unowned Object> anchors = new HashTable<string, unowned Object>.full(str_hash, str_equal, g_free, null);
 		private List<Object> objects;
@@ -235,24 +236,19 @@ namespace GLib.YAML {
 			if(node.get_pointer() != null) {
 				return (Object) node.get_pointer();
 			}
-			try {
-				if(type == Type.INVALID) type = Demangler.resolve_type(real_name);
 
-				debug("creating object of type `%s'", type.name());
-				Object obj = Object.new(type);
-				((Buildable*) obj)->set_name(node.anchor);
-				if(node.anchor != null) {
-					anchors.insert(node.anchor, obj);
-				}
-				node.set_pointer(obj.ref(), g_object_unref);
-				obj.set_data("node", node);
-				objects.prepend(obj);
-				return obj;
-			} catch (Error.SYMBOL_NOT_FOUND e) {
-				throw new Error.TYPE_NOT_FOUND(
-					"Type %s(%s) is not found",
-					real_name, node.start_mark.to_string());
+			if(type == Type.INVALID) type = Demangler.resolve_type(real_name);
+
+			debug("creating object of type `%s'", type.name());
+			Object obj = Object.new(type);
+			((Buildable*) obj)->set_name(node.anchor);
+			if(node.anchor != null) {
+				anchors.insert(node.anchor, obj);
 			}
+			node.set_pointer(obj.ref(), g_object_unref);
+			obj.set_data("node", node);
+			objects.prepend(obj);
+			return obj;
 		}
 
 		private Type get_child_type(Object obj, string tag) {
@@ -282,7 +278,7 @@ namespace GLib.YAML {
 			}
 			
 		}
-		private void process_property(Object obj, ParamSpec pspec, GLib.YAML.Node node) throws Error {
+		private void process_property(Object obj, ParamSpec pspec, GLib.YAML.Node node) throws GLib.Error {
 
 			Value gvalue = Value(pspec.value_type);
 			if(pspec.value_type == typeof(int)) {
@@ -517,7 +513,8 @@ namespace GLib.YAML {
 			}
 			return symbol;
 		}
-		private static delegate Type TypeFunc();
+		[CCode (has_target = false)]
+		private delegate Type TypeFunc();
 		/**
 		 * Resolve a GType from the class_name.
 		 *
