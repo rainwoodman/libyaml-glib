@@ -366,7 +366,23 @@ namespace GLib.YAML {
 				}
 			}  else
 			if(pspec.value_type.is_a(Type.ENUM)) {
-				gvalue.set_enum((int)cast_to_scalar(node).to_long());
+				weak string name = cast_to_scalar(node);
+				EnumClass eclass = (EnumClass) pspec.value_type.class_ref();
+				unowned EnumValue evalue = eclass.get_value_by_name(name);
+				if(evalue == null)
+					evalue = eclass.get_value_by_nick(name);
+				int e = 0;
+				if(evalue == null) {
+					weak string endptr = null;
+					e = (int) name.to_int64(out endptr, 0);
+					if((void*)endptr == (void*)name) {
+						throw new Error.UNKNOWN_PROPERTY_TYPE(
+							"enum value %s unknown",
+							name);
+					}
+				} else
+					e = evalue.value;
+				gvalue.set_enum(e);
 			}
 			else {
 				throw new Error.UNKNOWN_PROPERTY_TYPE(

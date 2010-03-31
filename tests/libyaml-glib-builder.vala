@@ -49,14 +49,14 @@ public class Invoice: GLib.Object, Buildable {
 			bill_to.family,
 			bill_to.address.lines,
 			bill_to.address.city,
-			bill_to.address.state,
+			bill_to.address.state.to_string(),
 			bill_to.address.postal);
 		sb.append_printf("%s %s \n %s %s %s %s\n", 
 			ship_to.given,
 			ship_to.family,
 			ship_to.address.lines,
 			ship_to.address.city,
-			ship_to.address.state,
+			ship_to.address.state.to_string(),
 			ship_to.address.postal);
 
 		return sb.str;
@@ -77,10 +77,25 @@ public class Contact : GLib.Object, Buildable {
 public class Address : Object, Buildable {
 	public string lines {get; set;}
 	public string city {get; set;}
-	public string state {get; set;}
+	public State state {get; set;}
 	public string postal {get; set;}
 }
-
+[CCode (cprefix="")]
+public enum State {
+	PA,
+	MI
+	;
+	public string to_string(){
+		switch(this) {
+			case State.MI:
+				return "MI";
+			case State.PA:
+				return "PA";
+			default:
+				return "N/A";
+		}
+	}
+}
 public class MyAddress : Address {
 }
 const string buffer =
