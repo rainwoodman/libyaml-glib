@@ -29,27 +29,25 @@ using YAML;
  * libyaml is used for parsing and emitting events.
  *
  */
-namespace GLib.YAML {
 	/**
 	 * Internal class used to load the document
 	 */
-	internal class Loader {
+	internal class GLib.YAML.Loader {
 		public Loader() {}
 		private void parse_with_throw(ref Parser parser, out Event event)
-		throws Error {
+		throws GLib.YAML.Exception {
 			if(parser.parse(out event)) {
 				return;
 			}
-			throw new Error.PARSER_ERROR(
+			throw new GLib.YAML.Exception.INTERNAL (
 			"Parser encounters an error: %s at %u(%s)\n"
 			+ "Error Context: '%s'",
 				parser.problem,
 				parser.problem_offset,
 				parser.problem_mark.to_string(),
 				parser.context);
-
-
 		}
+
 		private Document document;
 		/**
 		 * Load a YAML stream from a Parser to a Document.
@@ -57,7 +55,7 @@ namespace GLib.YAML {
 		 * Alias are looked up at the very end of the stage.
 		 */
 		public bool load(ref Parser parser, Document document) 
-		throws Error {
+		throws GLib.YAML.Exception {
 			this.document = document;
 			Event event;
 			/* Look for a StreamStart */
@@ -94,7 +92,7 @@ namespace GLib.YAML {
 				var alias_node = node as Node.Alias;
 				alias_node.node = document.anchors.lookup(alias_node.anchor);
 				if(alias_node != null) continue;
-				throw new Error.UNRESOLVED_ALIAS(
+				throw new GLib.YAML.Exception.RUNTIME(
 					"Alias '%s' cannot be resolved.",
 					alias_node.anchor);
 			}
@@ -106,7 +104,7 @@ namespace GLib.YAML {
 		 * @return the loaded node.
 		 */
 		public Node load_node(ref Parser parser, ref Event last_event) 
-		throws Error {
+		throws GLib.YAML.Exception {
 			switch(last_event.type) {
 				case EventType.ALIAS_EVENT:
 					return load_alias(ref parser, ref last_event);
@@ -121,7 +119,7 @@ namespace GLib.YAML {
 			}
 		}
 		public Node? load_alias(ref Parser parser, ref Event event)
-		throws Error {
+		throws GLib.YAML.Exception {
 			Node.Alias node = new Node.Alias();
 			node.anchor = event.data.alias.anchor;
 
@@ -131,15 +129,14 @@ namespace GLib.YAML {
 
 			return node;
 		}
-		private static string normalize_tag(string? tag, string @default)
-		throws Error {
+		private static string normalize_tag(string? tag, string @default) {
 			if(tag == null || tag == "!") {
 				return @default;
 			}
 			return tag;
 		}
 		public Node? load_scalar(ref Parser parser, ref Event event)
-		throws Error {
+		throws GLib.YAML.Exception {
 			Node.Scalar node = new Node.Scalar();
 			node.anchor = event.data.scalar.anchor;
 			node.tag = normalize_tag(event.data.scalar.tag,
@@ -157,7 +154,7 @@ namespace GLib.YAML {
 			return node;
 		}
 		public Node? load_sequence(ref Parser parser, ref Event event)
-		throws Error {
+		throws GLib.YAML.Exception {
 			Node.Sequence node = new Node.Sequence();
 			node.anchor = event.data.sequence_start.anchor;
 			node.tag = normalize_tag(event.data.sequence_start.tag,
@@ -189,7 +186,7 @@ namespace GLib.YAML {
 			return node;
 		}
 		public Node? load_mapping(ref Parser parser, ref Event event)
-		throws Error {
+		throws GLib.YAML.Exception {
 			Node.Mapping node = new Node.Mapping();
 			node.tag = normalize_tag(event.data.mapping_start.tag,
 					DEFAULT_MAPPING_TAG);
@@ -223,4 +220,3 @@ namespace GLib.YAML {
 			return node;
 		}
 	}
-}
