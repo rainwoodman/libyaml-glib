@@ -117,6 +117,10 @@ namespace GLib.YAML {
 			}
 			return this;
 		}
+
+		public string get_location() {
+			return "%s-%s".printf(start_mark.to_string(), end_mark.to_string());
+		}
 		/**
 		 * An Alias Node
 		 *
@@ -197,7 +201,8 @@ namespace GLib.YAML {
 		/**
 		 * Create a document from a parser
 		 * */
-		public Document.from_parser(ref Parser parser) throws Error {
+		public Document.from_parser(ref Parser parser)
+		throws GLib.YAML.Exception {
 			Loader loader = new Loader();
 			loader.load(ref parser, this);
 		}
@@ -205,7 +210,8 @@ namespace GLib.YAML {
 		/**
 		 * Create a document from a string
 		 * */
-		public Document.from_string(string str) throws Error {
+		public Document.from_string(string str)
+		throws GLib.YAML.Exception {
 			Loader loader = new Loader();
 			Parser parser = Parser();
 			parser.set_input_string(str, str.size());
@@ -215,7 +221,8 @@ namespace GLib.YAML {
 		/**
 		 * Create a document from a file stream
 		 * */
-		public Document.from_file(FileStream file) throws Error {
+		public Document.from_file(FileStream file)
+		throws GLib.YAML.Exception {
 			Loader loader = new Loader();
 			Parser parser = Parser();
 			parser.set_input_file(file);

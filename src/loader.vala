@@ -92,7 +92,7 @@ using YAML;
 				var alias_node = node as Node.Alias;
 				alias_node.node = document.anchors.lookup(alias_node.anchor);
 				if(alias_node != null) continue;
-				throw new GLib.YAML.Exception.RUNTIME(
+				throw new GLib.YAML.Exception.LOADER (
 					"Alias '%s' cannot be resolved.",
 					alias_node.anchor);
 			}

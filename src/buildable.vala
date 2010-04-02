@@ -155,8 +155,9 @@ namespace GLib.YAML {
 		 *   the node. It is actually a GLib.YAML.Node.
 		 */
 		public virtual void custom_node(Builder builder, string tag, GLib.YAML.Node node) throws GLib.Error {
-			throw new Error.PROPERTY_NOT_FOUND(
-				"Property %s.%s not found",
+			throw new GLib.YAML.Exception.BUILDER (
+				"%s: Property %s.%s is not defined",
+				node.get_location(),
 				get_type().name(), tag);
 		}
 	}

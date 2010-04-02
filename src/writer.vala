@@ -23,20 +23,13 @@
  ***/
 
 using YAML;
-/**
- * The GLib binding of libyaml.
- *
- * libyaml is used for parsing and emitting events.
- *
- */
-namespace GLib.YAML {
 	/**
 	 * Write an Object to a YAML string.
 	 *
 	 * For a BoxedType, implement a _to_string() member to
 	 * return a newly allocated string represention of the object.
 	 */
-	public class Writer {
+	public class GLib.YAML.Writer {
 		[CCode (has_target = false)]
 		private delegate string StringFunc(void* boxed);
 		public Writer(string? prefix = null) {
@@ -48,7 +41,7 @@ namespace GLib.YAML {
 		private unowned StringBuilder sb = null;
 		Emitter emitter;
 
-		public void stream_object(Object object, StringBuilder sb) throws Error {
+		public void stream_object(Object object, StringBuilder sb) throws GLib.YAML.Exception {
 			Event event = {0};
 			this.sb = sb;
 			sb.truncate(0);
@@ -63,7 +56,7 @@ namespace GLib.YAML {
 
 			try {
 				write_object(object, true);
-			} catch (Error e) {
+			} catch (GLib.YAML.Exception e) {
 				throw e;
 			} finally {
 				Event.document_end_initialize(ref event);
@@ -76,15 +69,18 @@ namespace GLib.YAML {
 			}
 			return;
 		}
-		private void write_object(Object object, bool write_type_tag = false) throws Error {
+		private void write_object(Object object, bool write_type_tag = false)
+		throws GLib.YAML.Exception {
 			Event event = {0};
 			if(write_type_tag) {
 				string type_name = object.get_type().name();
 				if(prefix != null) {
-					if(type_name.has_prefix(prefix))
-						Event.mapping_start_initialize(ref event, null, "!" + type_name.offset(prefix.length), false);
-					else
-						error("Internal program error, trying to serialize a object that is not in current namespace(%s)", prefix);
+					if(!type_name.has_prefix(prefix)) {
+						throw new GLib.YAML.Exception.WRITER (
+						"object that is not in current namespace(%s)", prefix);
+					}
+					/* else */
+					Event.mapping_start_initialize(ref event, null, "!" + type_name.offset(prefix.length), false);
 				} else {
 					Event.mapping_start_initialize(ref event, null, "!" + type_name, false);
 				}
@@ -114,7 +110,8 @@ namespace GLib.YAML {
 			Event.clean(ref event);
 		}
 
-		private void write_children(Buildable buildable, string tag, Type type) throws Error {
+		private void write_children(Buildable buildable, string tag, Type type)
+		throws GLib.YAML.Exception {
 			Event event = {0};
 			Event.scalar_initialize(ref event, null, null, tag, (int)tag.size());
 			emitter.emit(ref event);
@@ -134,41 +131,51 @@ namespace GLib.YAML {
 			Event.clean(ref event);
 		}
 
-		private void write_property(Object object, ParamSpec pspec) throws Error {
+		private void write_property(Object object, ParamSpec pspec) 
+		throws GLib.YAML.Exception {
 			Event event = {0};
 			Event.scalar_initialize(ref event, null, null, pspec.name, (int)pspec.name.size());
 			emitter.emit(ref event);
 			Value value = Value(pspec.value_type);
-			string str = "(*unsupported)";
+			string str = null;
 			object.get_property(pspec.name, ref value);
 
 			if(pspec.value_type == typeof(int)) {
 				str = value.get_int().to_string();
+				write_scalar(ref event, str);
 			} else
 			if(pspec.value_type == typeof(uint)) {
 				str = value.get_uint().to_string();
+				write_scalar(ref event, str);
 			} else
 			if(pspec.value_type == typeof(long)) {
 				str = value.get_long().to_string();
+				write_scalar(ref event, str);
 			} else
 			if(pspec.value_type == typeof(ulong)) {
 				str = value.get_ulong().to_string();
+				write_scalar(ref event, str);
 			} else
 			if(pspec.value_type == typeof(string)) {
 				str = value.dup_string();
 				if(str == null) str = "~";
+				write_scalar(ref event, str);
 			} else
 			if(pspec.value_type == typeof(float)) {
 				str = value.get_float().to_string();
+				write_scalar(ref event, str);
 			} else
 			if(pspec.value_type == typeof(double)) {
 				str = value.get_double().to_string();
+				write_scalar(ref event, str);
 			} else
 			if(pspec.value_type == typeof(bool)) {
 				str = value.get_boolean().to_string();
+				write_scalar(ref event, str);
 			} else
 			if(pspec.value_type == typeof(Type)) {
 				str = value.get_gtype().name();
+				write_scalar(ref event, str);
 			} else
 			if(pspec.value_type.is_a(typeof(Object))) {
 				unowned Object child = value.get_object();
@@ -182,9 +189,9 @@ namespace GLib.YAML {
 					} else {
 						write_object(child, false);
 					}
-					str = null;
 				} else {
 					str = "~";
+					write_scalar(ref event, str);
 				}
 			} else
 			if(pspec.value_type.is_a(Type.BOXED)) {
@@ -194,12 +201,9 @@ namespace GLib.YAML {
 					str = "~";
 				} else {
 					StringFunc string_func = (StringFunc) string_symbol;
-					if(string_func == null)
-						throw new Error.UNKNOWN_PROPERTY_TYPE(
-							"Unhandled property type %s, to_string not found.",
-							pspec.value_type.name());
 					str = string_func(boxed_value);
 				}
+				write_scalar(ref event, str);
 			}  else
 			if(pspec.value_type.is_a(Type.ENUM)) {
 				EnumClass eclass = (EnumClass) pspec.value_type.class_ref();
@@ -210,28 +214,26 @@ namespace GLib.YAML {
 				} else {
 					str = e.to_string();
 				}
+				write_scalar(ref event, str);
 			}
 			else {
-				throw new Error.UNKNOWN_PROPERTY_TYPE(
+				throw new GLib.YAML.Exception.WRITER (
 					"Unhandled property type %s",
 					pspec.value_type.name());
 			}
-			if(str != null) {
-				/* FIXME: str != null is not a good indicator,
-				 * use a boolean like need_scalar or something !*/
-				if(null != str.chr(-1, '\n')) {
-					Event.scalar_initialize(ref event, null, null, str, (int)str.size(), true, true,
-						ScalarStyle.LITERAL_SCALAR_STYLE);
-				} else {
-					Event.scalar_initialize(ref event, null, null, str, (int)str.size());
-				}
-				emitter.emit(ref event);
-			}
 			Event.clean(ref event);
 		}
-		public int handler(char[] buffer) {
+		private void write_scalar(ref Event event, string str) {
+			if(null != str.chr(-1, '\n')) {
+				Event.scalar_initialize(ref event, null, null, str, (int)str.size(), true, true,
+					ScalarStyle.LITERAL_SCALAR_STYLE);
+			} else {
+				Event.scalar_initialize(ref event, null, null, str, (int)str.size());
+			}
+			emitter.emit(ref event);
+		}
+		private int handler(char[] buffer) {
 			sb.append_len((string)buffer, buffer.length);
 			return 1;
 		}
 	}
-}
