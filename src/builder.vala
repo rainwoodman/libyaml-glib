@@ -357,8 +357,6 @@ throws GLib.YAML.Exception {
 					void * new_symbol = Demangler.resolve_function(pspec.value_type.name(), "new_from_string");
 					NewFunc new_func = (NewFunc) new_symbol;
 					void* memory = new_func(strval);
-					/*FIXME: memory is leaked. Waiting for more stable
-					 * VALA api on structs */
 					if(memory == null) {
 						throw new GLib.YAML.Exception.BUILDER (
 						"%s: boxed type `%s' parser failed",
@@ -366,20 +364,20 @@ throws GLib.YAML.Exception {
 						pspec.value_type.name(),
 						node.start_mark.to_string());
 					}
-					gvalue.set_boxed(memory);
+					g_value_take_boxed(ref gvalue, memory);
 				} catch (GLib.YAML.Exception.DEMANGLER e) {
 					void * parse_symbol = Demangler.resolve_function(pspec.value_type.name(), "parse");
 					ParseFunc parse_func = (ParseFunc) parse_symbol;
-					char[] memory = new char[MAX_BOXED_SIZE];
+					void* memory = (void*) new char[MAX_BOXED_SIZE];
 					warning("Allocating %d bytes for Boxed type %s.",
 					MAX_BOXED_SIZE, pspec.value_type.name());
-					if(!parse_func(strval, (void*)memory)) {
+					if(!parse_func(strval, memory)) {
 						throw new GLib.YAML.Exception.BUILDER (
 						"%s: Boxed type `%s' parser failed",
 						node.get_location(),
 						pspec.value_type.name());
 					}
-					gvalue.set_boxed(memory);
+					g_value_take_boxed(ref gvalue, memory);
 				}
 			}  else
 			if(pspec.value_type.is_a(Type.ENUM)) {
