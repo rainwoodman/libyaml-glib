@@ -232,7 +232,7 @@ throws GLib.YAML.Exception {
 		private void process_value_nodes() 
 throws GLib.YAML.Exception {
 			foreach(var obj in objects) {
-				var node = (GLib.YAML.Node)obj.get_data("node");
+				var node = obj.get_data<GLib.YAML.Node>("node");
 				process_object_value_node(obj, node);
 			}
 			

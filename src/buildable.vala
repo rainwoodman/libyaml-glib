@@ -44,7 +44,7 @@ namespace GLib.YAML {
 		 * The name is actually stored in `buildable-name' data member.
 		 */
 		public virtual unowned string get_name() {
-			return (string) this.get_data("buildable-name");
+			return this.get_data<unowned string>("buildable-name");
 		}
 		/**
 		 * get the anchor(name) of the object.
@@ -53,9 +53,9 @@ namespace GLib.YAML {
 		 */
 		public virtual void set_name(string? name) {
 			if(name != null) {
-				this.set_data_full("buildable-name", Memory.dup(name, (int) name.size() + 1), g_free);
+				this.set_data<string>("buildable-name", name.dup());
 			} else {
-				this.set_data("buildable-name", null);
+				this.set_data_full("buildable-name", null, null);
 			}
 		}
 		/**
