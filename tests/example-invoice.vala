@@ -94,17 +94,6 @@ namespace Model {
 	public enum State {
 		PA,
 		MI
-		;
-		public string to_string(){
-			switch(this) {
-				case State.MI:
-					return "MI";
-				case State.PA:
-					return "PA";
-				default:
-					return "N/A";
-			}
-		}
 	}
 	public class MyAddress : Address {
 	}
