@@ -210,7 +210,9 @@ using YAML;
 				int e = value.get_enum();
 				unowned EnumValue evalue = eclass.get_value(e);
 				if(evalue != null) {
-					str = evalue.value_name;
+					/* uppercase looks more enum really an issue of
+					 * vala. enum nicks are all lowercase in vala. */
+					str = evalue.value_nick.up();
 				} else {
 					str = e.to_string();
 				}

@@ -385,7 +385,8 @@ throws GLib.YAML.Exception {
 				EnumClass eclass = (EnumClass) pspec.value_type.class_ref();
 				unowned EnumValue evalue = eclass.get_value_by_name(name);
 				if(evalue == null)
-					evalue = eclass.get_value_by_nick(name);
+					/* enum nicks are lowercase in vala*/
+					evalue = eclass.get_value_by_nick(name.down());
 				int e = 0;
 				if(evalue == null) {
 					weak string endptr = null;
