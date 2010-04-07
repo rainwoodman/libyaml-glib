@@ -1,5 +1,57 @@
 using GLib.YAML;
 
+/* Controller + View = UI, Model is declared later */
+namespace UI {
+	public static void main(string[] args) {
+		GLib.YAML.Builder b = new GLib.YAML.Builder("Model");
+		try {
+		var invoice = b.build_from_file(stdin) as Model.Invoice;
+		/* manipulating a property */
+		invoice.foo = "This is a simple test";
+		var w = new GLib.YAML.Writer();
+		var sb = new StringBuilder("");
+		w.stream_object(invoice, sb);
+		stdout.printf("reprinted invoice\n");
+		stdout.printf("%s\n", sb.str);
+		} catch (GLib.YAML.Exception e) {
+			error("%s", e.message);
+		}
+	}
+	/* unused */
+	public static string summary(Model.Invoice invoice, StringBuilder? sb = null) {
+		StringBuilder sb_ref = null;
+		if(sb == null) {
+			sb_ref = new StringBuilder("");
+			sb = sb_ref;
+		}
+		sb.append_printf("%d\n", invoice.invoice);
+		sb.append_printf("%s\n", invoice.date);
+		sb.append_printf("%g\n", invoice.tax);
+		sb.append_printf("%g\n", invoice.total);
+		sb.append_printf("%s\n", invoice.comments);
+		foreach(var o in invoice.get_children("products")) {
+			var p = (Model.Product) o;
+			sb.append_printf("%s %d %s %g\n", p.sku, p.quantity, p.description, p.price);
+		}
+		sb.append_printf("%s %s \n %s %s %s %s\n", 
+			invoice.bill_to.given,
+			invoice.bill_to.family,
+			invoice.bill_to.address.lines,
+			invoice.bill_to.address.city,
+			invoice.bill_to.address.state.to_string(),
+			invoice.bill_to.address.postal.code);
+		sb.append_printf("%s %s \n %s %s %s %s\n", 
+			invoice.ship_to.given,
+			invoice.ship_to.family,
+			invoice.ship_to.address.lines,
+			invoice.ship_to.address.city,
+			invoice.ship_to.address.state.to_string(),
+			invoice.ship_to.address.postal.code);
+
+		return sb.str;
+	}
+}
+
 /****
  * Wrap buildable into a namespace prefix, so that the builder won't
  * build objects from our internal classes which shall never be built.
@@ -93,8 +145,13 @@ namespace Model {
 	/* Example on parsing enums */
 	public enum State {
 		PA,
-		MI
+		MI,
+		MA,
+		OTHER
 	}
+}
+
+namespace Model {
 	/* Demonstration of specific subtyping.
 	 * read invoice.yaml for the extended field.
 	 *
@@ -102,51 +159,4 @@ namespace Model {
 	public class PaypalAddress : Address {
 		public bool verified {get; set; default = false;}
 	}
-}
-
-public static void main(string[] args) {
-	GLib.YAML.Builder b = new GLib.YAML.Builder("Model");
-	try {
-	var invoice = b.build_from_file(stdin) as Model.Invoice;
-	invoice.foo = "This is a simple test";
-	var w = new GLib.YAML.Writer();
-	var sb = new StringBuilder("");
-	w.stream_object(invoice, sb);
-	stdout.printf("reprinted invoice\n");
-	stdout.printf("%s\n", sb.str);
-	} catch (GLib.YAML.Exception e) {
-		error("%s", e.message);
-	}
-}
-public static string summary(Model.Invoice invoice, StringBuilder? sb = null) {
-	StringBuilder sb_ref = null;
-	if(sb == null) {
-		sb_ref = new StringBuilder("");
-		sb = sb_ref;
-	}
-	sb.append_printf("%d\n", invoice.invoice);
-	sb.append_printf("%s\n", invoice.date);
-	sb.append_printf("%g\n", invoice.tax);
-	sb.append_printf("%g\n", invoice.total);
-	sb.append_printf("%s\n", invoice.comments);
-	foreach(var o in invoice.get_children("products")) {
-		var p = (Model.Product) o;
-		sb.append_printf("%s %d %s %g\n", p.sku, p.quantity, p.description, p.price);
-	}
-	sb.append_printf("%s %s \n %s %s %s %s\n", 
-		invoice.bill_to.given,
-		invoice.bill_to.family,
-		invoice.bill_to.address.lines,
-		invoice.bill_to.address.city,
-		invoice.bill_to.address.state.to_string(),
-		invoice.bill_to.address.postal.code);
-	sb.append_printf("%s %s \n %s %s %s %s\n", 
-		invoice.ship_to.given,
-		invoice.ship_to.family,
-		invoice.ship_to.address.lines,
-		invoice.ship_to.address.city,
-		invoice.ship_to.address.state.to_string(),
-		invoice.ship_to.address.postal.code);
-
-	return sb.str;
 }
