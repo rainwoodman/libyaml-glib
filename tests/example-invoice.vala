@@ -95,7 +95,12 @@ namespace Model {
 		PA,
 		MI
 	}
-	public class MyAddress : Address {
+	/* Demonstration of specific subtyping.
+	 * read invoice.yaml for the extended field.
+	 *
+	 * */
+	public class PaypalAddress : Address {
+		public bool verified {get; set; default = false;}
 	}
 }
 

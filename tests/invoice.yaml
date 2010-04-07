@@ -6,7 +6,8 @@ date   : 2001-01-23
 bill-to: &id001
     given  : Chris
     family : Dumars
-    address: !MyAddress
+    address: !PaypalAddress
+        verified: true
         lines: |
             458 Walkman Dr.
             Suite #292
