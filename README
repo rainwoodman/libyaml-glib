@@ -58,9 +58,21 @@ Install the package with
     yaml-glib-debuginfo-0.1-5.i386.rpm \
     yaml-glib-devel-0.1-5.i386.rpm'
 
+Example
+=======
+  test/example-invoice.vala is an example of an invoice printer.
+  Example data is in test/invoice.yaml. Feed the data to the standard
+  input of example-invoice. The program will then parse and build the invoice,
+  then rewrite the model back to standard output.
+
+  Notice how PaypalAddress is extended to the original Model namespace, 
+  also how structs and enums are processed.
+
+  The invoice data is modified from the standard YAML example.
+
 Documentation
 =============
-  The documenation can be compiled from valadoc. If a valadoc 
+  The documenation can be compiled from valadoc, if a valadoc 
   compiler is available. No documentation is installed. It is recommended
   to turn off the documentation with --disable-valadoc all the time until
   valadoc is stable.
