@@ -62,6 +62,10 @@ namespace Model {
 	 * */
 	public class Invoice: GLib.Object, Buildable {
 		public string foo {get; set;}
+		/* The following field, meta-data is skipped by
+		 * yaml */
+		public string meta_data {get; set; 
+		default = "META-DATA, KEEP INTACT";}
 		public int invoice {get; set;}
 		public string date {get; set;}
 		public Contact bill_to {get; set;}
@@ -89,6 +93,8 @@ namespace Model {
 		 * in vala. */
 		static construct {
 			Buildable.register_type(typeof(Invoice), tags, types);
+			/* Skip meta-data */
+			Buildable.set_property_hint(typeof(Invoice), "meta-data", Buildable.PropertyHint.SKIP);
 		}
 
 		/* return the child elements for the given tag.

@@ -93,6 +93,10 @@ using YAML;
 			ParamSpec[] specs = klass.list_properties();
 
 			foreach(unowned ParamSpec spec in specs) {
+				if(0 != Buildable.get_property_hint_pspec(spec)
+					& Buildable.PropertyHint.SKIP)
+					/* skip the properties marked as SKIP */
+					continue;
 				write_property(object, spec);
 			}
 			if(object is Buildable) {

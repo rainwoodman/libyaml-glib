@@ -38,6 +38,12 @@ namespace GLib.YAML {
 	 *
 	 **/
 	public interface Buildable : Object {
+		[Flags]
+		public enum PropertyHint {
+			NONE,
+			SKIP /* Skipped by the writer */
+		}
+
 		/**
 		 * Set the anchor(name) of the object.
 		 *
@@ -82,6 +88,38 @@ namespace GLib.YAML {
 			g_type_set_qdata(type, Quark.from_string("buildable-child-types"), types);
 			g_type_set_qdata(type, Quark.from_string("buildable-child-types-len"), (void*) types.length);
 		}
+
+		/**
+		 * set the hint for a property, this is a convenient wrapper
+		 * over set_property_hint_pspec.
+		 * */
+		public static void set_property_hint (Type type, string property, PropertyHint hint) {
+			ObjectClass klass = (ObjectClass) type.class_ref();
+			weak ParamSpec pspec = klass.find_property(property);
+			set_property_hint_pspec(pspec, hint);
+		}
+
+		 /*
+		  * set property hint on a property. Property hint is
+		  * used by the builder and writer to hint the access of a property.
+		  *
+		  * currently only PropertyHint.SKIP is supported.
+		  * */
+		public static void set_property_hint_pspec(ParamSpec pspec, PropertyHint hint) {
+			pspec.set_qdata(Quark.from_string("buildable-property-hint"), (void*) hint);
+		}
+
+		/* refer to set_property_hint */
+		public static PropertyHint get_property_hint(Type type, string property) {
+			ObjectClass klass = (ObjectClass) type.class_ref();
+			weak ParamSpec pspec = klass.find_property(property);
+			return get_property_hint_pspec(pspec);
+		}
+		/* refer to set_property_hint */
+		public static PropertyHint get_property_hint_pspec(ParamSpec pspec) {
+			return (PropertyHint) pspec.get_qdata(Quark.from_string("buildable-property-hint"));
+		}
+
 		/**
 		 * return a list of children types.
 		 * the returned array should not be freed/modified.
