@@ -409,6 +409,40 @@ throws GLib.YAML.Exception {
 				} else
 					e = evalue.value;
 				gvalue.set_enum(e);
+			} else
+			if(pspec.value_type.is_a(Type.FLAGS)) {
+				weak string expression = cast_to_scalar(node);
+				FlagsClass klass = (FlagsClass) pspec.value_type.class_ref();
+				string[] names = expression.split("|");
+				uint flags = 0; /* flag is 0 */
+				foreach(weak string name in names) {
+					uint f = 0;
+					name._strip();
+					if(name == "~") continue; /* null = 0 */
+					/* try the full name first */
+					unowned FlagsValue v = klass.get_value_by_name(name);
+					if(v == null) {
+					/* try the nick next */
+					/* flags nicks are lowercase in vala, try the nick*/
+						v = klass.get_value_by_nick(name.down());
+					}
+					if(v == null) {
+						/* try if his is a raw number */
+						weak string endptr = null;
+						f = (uint) name.to_int64(out endptr, 0);
+						if((void*)endptr == (void*)name) {
+							/* not actually an integer either */
+							throw new GLib.YAML.Exception.BUILDER (
+							"%s flag value `%s' is illegal",
+								node.get_location(),
+								name);
+						}
+					} else {
+						f = v.value;
+					}
+					flags |= f;
+				}
+				gvalue.set_flags(flags);
 			}
 			else {
 				throw new GLib.YAML.Exception.UNIMPLEMENTED (

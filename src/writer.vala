@@ -221,6 +221,26 @@ using YAML;
 					str = e.to_string();
 				}
 				write_scalar(ref event, str);
+			} else
+			if(pspec.value_type.is_a(Type.FLAGS)) {
+				FlagsClass fclass = (FlagsClass) pspec.value_type.class_ref();
+				StringBuilder sb = new StringBuilder("");
+				uint f = value.get_flags();
+				unowned FlagsValue? fvalue = fclass.get_first_value(f);
+				int i = 0;
+
+				if(fvalue == null || fvalue.value == 0) {
+					write_scalar(ref event, "~");
+				} else {
+					while(fvalue != null && fvalue.value != 0) {
+						if(i > 0) sb.append(" | ");
+						sb.append(fvalue.value_nick.up());
+						f = f & ~fvalue.value;
+						fvalue = fclass.get_first_value(f);
+						i++;
+					}
+					write_scalar(ref event, sb.str);
+				}
 			}
 			else {
 				throw new GLib.YAML.Exception.WRITER (

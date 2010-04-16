@@ -67,6 +67,7 @@ namespace Model {
 		public string meta_data {get; set; 
 		default = "META-DATA, KEEP INTACT";}
 		public int invoice {get; set;}
+		public Status status {get; set;}
 		public string date {get; set;}
 		public Contact bill_to {get; set;}
 		public Contact ship_to {get; set;}
@@ -107,6 +108,15 @@ namespace Model {
 			}
 			return null;
 		}
+	}
+
+	[Flags]
+	public enum Status {
+		NONE = 0,
+		ORDERED,
+		CANCELLED,
+		SHIPPED,
+		RETURNED,
 	}
 
 	public class Product : GLib.Object, Buildable {
