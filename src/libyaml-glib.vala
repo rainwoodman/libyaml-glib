@@ -214,7 +214,7 @@ namespace GLib.YAML {
 		throws GLib.YAML.Exception {
 			Loader loader = new Loader();
 			Parser parser = Parser();
-			parser.set_input_string(str, str.size());
+			parser.set_input_string(str, str.length);
 			loader.load(ref parser, this);
 		}
 

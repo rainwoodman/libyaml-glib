@@ -117,7 +117,7 @@ using YAML;
 		private void write_children(Buildable buildable, string tag, Type type)
 		throws GLib.YAML.Exception {
 			Event event = {0};
-			Event.scalar_initialize(ref event, null, null, tag, (int)tag.size());
+			Event.scalar_initialize(ref event, null, null, tag, (int)tag.length);
 			emitter.emit(ref event);
 
 			List<weak Object> children = buildable.get_children(tag);
@@ -138,7 +138,7 @@ using YAML;
 		private void write_property(Object object, ParamSpec pspec) 
 		throws GLib.YAML.Exception {
 			Event event = {0};
-			Event.scalar_initialize(ref event, null, null, pspec.name, (int)pspec.name.size());
+			Event.scalar_initialize(ref event, null, null, pspec.name, (int)pspec.name.length);
 			emitter.emit(ref event);
 			Value value = Value(pspec.value_type);
 			string str = null;
@@ -251,10 +251,10 @@ using YAML;
 		}
 		private void write_scalar(ref Event event, string str) {
 			if(null != str.chr(-1, '\n')) {
-				Event.scalar_initialize(ref event, null, null, str, (int)str.size(), true, true,
+				Event.scalar_initialize(ref event, null, null, str, (int)str.length, true, true,
 					ScalarStyle.LITERAL_SCALAR_STYLE);
 			} else {
-				Event.scalar_initialize(ref event, null, null, str, (int)str.size());
+				Event.scalar_initialize(ref event, null, null, str, (int)str.length);
 			}
 			emitter.emit(ref event);
 		}

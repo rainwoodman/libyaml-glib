@@ -52,7 +52,7 @@ public int main(string[] args) {
 	Parser parser = Parser();
 	
 	if(use_internal)
-		parser.set_input_string(buffer, buffer.size());
+		parser.set_input_string(buffer, buffer.length);
 	else if(filename != null) {
 		stream = FileStream.open(filename[0], "r");
 		assert(filename.length == 1);
