@@ -284,13 +284,8 @@ throws GLib.YAML.Exception {
 				}
 				ParamSpec pspec = ((ObjectClass)obj.get_type().class_peek()).find_property(key);
 				if(pspec != null) {
-					if(0 != Buildable.get_property_hint_pspec(pspec)
-						& Buildable.PropertyHint.SKIP) {
-						throw new GLib.YAML.Exception.BUILDER(
-						"%s: trying to assign a skipped property: %s",
-						node.get_location(),
-						pspec.name);
-					} else {
+					if(0 == (Buildable.get_property_hint_pspec(pspec)
+						& Buildable.PropertyHint.SKIP)) {
 						process_property(obj, pspec, value_node);
 					}
 				} else {
@@ -391,7 +386,7 @@ throws GLib.YAML.Exception {
 			if(pspec.value_type.is_a(Type.ENUM)) {
 				weak string name = cast_to_scalar(node);
 				EnumClass eclass = (EnumClass) pspec.value_type.class_ref();
-                unowned EnumValue? evalue = eclass.get_value_by_name(name);
+				unowned EnumValue? evalue = eclass.get_value_by_name(name);
 				if(evalue == null)
 					/* enum nicks are lowercase in vala*/
 					evalue = eclass.get_value_by_nick(name.down());
