@@ -13,9 +13,9 @@
  * Lesser General Public License for more details.
 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to 
+ * License along with this library; if not, write to
  *
- * the Free Software Foundation, Inc., 
+ * the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
  *
  * Author:
@@ -80,7 +80,7 @@ using YAML;
 						"object that is not in current namespace(%s)", prefix);
 					}
 					/* else */
-					Event.mapping_start_initialize(ref event, null, "!" + type_name.offset(prefix.length), false);
+                    Event.mapping_start_initialize(ref event, null, "!" + type_name.substring(prefix.length), false);
 				} else {
 					Event.mapping_start_initialize(ref event, null, "!" + type_name, false);
 				}
@@ -108,7 +108,7 @@ using YAML;
 					write_children(buildable, tags[i], types[i]);
 				}
 			}
-		
+
 			Event.mapping_end_initialize(ref event);
 			emitter.emit(ref event);
 			Event.clean(ref event);
@@ -135,7 +135,7 @@ using YAML;
 			Event.clean(ref event);
 		}
 
-		private void write_property(Object object, ParamSpec pspec) 
+		private void write_property(Object object, ParamSpec pspec)
 		throws GLib.YAML.Exception {
 			Event event = {0};
 			Event.scalar_initialize(ref event, null, null, pspec.name, (int)pspec.name.length);
@@ -212,7 +212,7 @@ using YAML;
 			if(pspec.value_type.is_a(Type.ENUM)) {
 				EnumClass eclass = (EnumClass) pspec.value_type.class_ref();
 				int e = value.get_enum();
-				unowned EnumValue evalue = eclass.get_value(e);
+                unowned EnumValue? evalue = eclass.get_value(e);
 				if(evalue != null) {
 					/* uppercase looks more enum really an issue of
 					 * vala. enum nicks are all lowercase in vala. */
@@ -250,7 +250,7 @@ using YAML;
 			Event.clean(ref event);
 		}
 		private void write_scalar(ref Event event, string str) {
-			if(null != str.chr(-1, '\n')) {
+            if(-1 != str.index_of_char(-1, '\n')) {
 				Event.scalar_initialize(ref event, null, null, str, (int)str.length, true, true,
 					ScalarStyle.LITERAL_SCALAR_STYLE);
 			} else {

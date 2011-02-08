@@ -13,9 +13,9 @@
  * Lesser General Public License for more details.
 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to 
+ * License along with this library; if not, write to
  *
- * the Free Software Foundation, Inc., 
+ * the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
  *
  * Author:
@@ -32,8 +32,8 @@ namespace GLib.YAML {
 	 *
 	 * Refer to GLib.YAML.Buildable
 	 *
-	 * The root of the document is a mapping, which is built to an object. 
-	 * Other objects are inserted into children of the root object, 
+	 * The root of the document is a mapping, which is built to an object.
+	 * Other objects are inserted into children of the root object,
 	 * supplied as items in sequences.
 	 *
 	 * ++ Two Stages of Building ++
@@ -67,7 +67,7 @@ namespace GLib.YAML {
 	 *         look for "_new_from_string" or "_parse" symbol of the type.
 	 *         if _new_from_string is found, a new boxed element is created,
 	 *         and assigned to the object.
-	 *         otherwise, if _parse is found, a temperory buffer of 
+	 *         otherwise, if _parse is found, a temperory buffer of
 	 *         MAX_BOXED_SIZE bytes is allocated, and _parse is invoked to
 	 *         fill in the buffer.
 	 *       * _parse function conforms the calling convention of
@@ -75,27 +75,27 @@ namespace GLib.YAML {
 	 *   # signals
 	 *     * Signal connection is not currently supported, but planned.
 	 *   # custom nodes
-	 *     * If the key doesn't match any of the priorly mentioned 
-	 *       catagories, Buildable.custom_node is invoked. 
-	 *     * If the buildable doesn't understand the node, 
+	 *     * If the key doesn't match any of the priorly mentioned
+	 *       catagories, Buildable.custom_node is invoked.
+	 *     * If the buildable doesn't understand the node,
 	 *       it should report a PROPERTY_NOT_FOUND error.
 	 *
 	 * [warning:
-	 *   Be aware that if the Boxed struct is larger than the temporary buffer, 
-	 *   there will be a memory corruption. Currently no good fix is found, 
+	 *   Be aware that if the Boxed struct is larger than the temporary buffer,
+	 *   there will be a memory corruption. Currently no good fix is found,
 	 *   because GLib doesn't store the size of a Boxed type.
 	 *   Rule of thumb: Always implement _new_from_string(string)!
 	 * ]
 	 *
-	 * Here is an example of the YAML file, 
-	 * which is semantically equivalent to the GtkBuilder example given in 
+	 * Here is an example of the YAML file,
+	 * which is semantically equivalent to the GtkBuilder example given in
 	 * DevHelp, GtkBuildable.
 	 *
 	 * {{{
 	 * --- !GtkDialog
 	 * internals:
 	 *   vbox : { border-width : 10 }
-	 *   action-area : 
+	 *   action-area :
 	 *     border-width : 20
 	 *     objects:
 	 *       - !GtkHButtonBox &hbuttonbox1
@@ -106,8 +106,8 @@ namespace GLib.YAML {
 	 * }}}
 	 *
 	 * [warning:
-	 *   Although this example is a valid YAML understood by the Builder, 
-	 *   it cannot be used to build the widgets, because GtkWidget 
+	 *   Although this example is a valid YAML understood by the Builder,
+	 *   it cannot be used to build the widgets, because GtkWidget
 	 *   doesn't implement the required GYAMLBuildable interface.
 	 * ]
 	 *
@@ -134,7 +134,7 @@ namespace GLib.YAML {
 		/**
 		 * Add objects from a string
 		 **/
-		public void add_from_string(string str) 
+		public void add_from_string(string str)
 throws GLib.YAML.Exception {
 			warning("this function is deprecated.");
 			assert(document == null);
@@ -145,7 +145,7 @@ throws GLib.YAML.Exception {
 		/**
 		 * Add objects from a file stream
 		 **/
-		public void add_from_file (FileStream file) 
+		public void add_from_file (FileStream file)
 throws GLib.YAML.Exception {
 			warning("this function is deprecated.");
 			assert(document == null);
@@ -157,7 +157,7 @@ throws GLib.YAML.Exception {
 		/**
 		 * Build an object from a given string
 		 **/
-		public Object? build_from_string(string str) 
+		public Object? build_from_string(string str)
 throws GLib.YAML.Exception {
 			document = null;
 			document = new GLib.YAML.Document.from_string(str);
@@ -169,7 +169,7 @@ throws GLib.YAML.Exception {
 		/**
 		 * Build an object from a given filestream
 		 **/
-		public Object? build_from_file(FileStream file) 
+		public Object? build_from_file(FileStream file)
 throws GLib.YAML.Exception {
 			document = null;
 			document = new GLib.YAML.Document.from_file(file);
@@ -179,17 +179,17 @@ throws GLib.YAML.Exception {
 		}
 
 		/**
-		 * Build a object according to a given type. This function is 
+		 * Build a object according to a given type. This function is
 		 * intended to be used in implementing Buildable.custom_node .
 		 *
-		 * If the an object is already built for the node, it will return 
+		 * If the an object is already built for the node, it will return
 		 * the built object.
 		 *
 		 * [warning:
-		 *   Do not call this function in any places other than 
-		 *   the implementation of the Builable interface. It depends 
-		 *   on the internal data structures that are available only in 
-		 *   the object building process. Once the objects are built, 
+		 *   Do not call this function in any places other than
+		 *   the implementation of the Builable interface. It depends
+		 *   on the internal data structures that are available only in
+		 *   the object building process. Once the objects are built,
 		 *   these data structures are destroyed.
 		 * ]
 		 *
@@ -200,7 +200,7 @@ throws GLib.YAML.Exception {
 		 *
 		 * @return the built object
 		 */
-		public Object build_object(GLib.YAML.Node node, Type type) 
+		public Object build_object(GLib.YAML.Node node, Type type)
 		throws GLib.YAML.Exception {
 			if(node.get_pointer() != null) {
 				return (Object) node.get_pointer();
@@ -217,8 +217,8 @@ throws GLib.YAML.Exception {
 				return class_name;
 		}
 
-		private void bootstrap_objects(GLib.YAML.Document document) 
-		
+		private void bootstrap_objects(GLib.YAML.Document document)
+
 throws GLib.YAML.Exception {
 			foreach(var node in document.nodes) {
 				/* skip non objects */
@@ -229,20 +229,20 @@ throws GLib.YAML.Exception {
 			}
 		}
 
-		private void process_value_nodes() 
+		private void process_value_nodes()
 throws GLib.YAML.Exception {
 			foreach(var obj in objects) {
 				var node = obj.get_data<GLib.YAML.Node>("node");
 				process_object_value_node(obj, node);
 			}
-			
+
 		}
 
-		/* 
-		 * Build a object without setting its properties and children, 
+		/*
+		 * Build a object without setting its properties and children,
 		 * if type == Type.INVALID, the type is deducted from the node.tag.
 		 */
-		private Object bootstrap_object(GLib.YAML.Node node, Type type = Type.INVALID) 
+		private Object bootstrap_object(GLib.YAML.Node node, Type type = Type.INVALID)
 		throws GLib.YAML.Exception {
 			string real_name = get_full_class_name(node.tag.next_char());
 			if(node.get_pointer() != null) {
@@ -272,7 +272,7 @@ throws GLib.YAML.Exception {
 			return type;
 		}
 
-		private void process_object_value_node(Object obj, GLib.YAML.Node node) 
+		private void process_object_value_node(Object obj, GLib.YAML.Node node)
 throws GLib.YAML.Exception {
 			var mapping = node as GLib.YAML.Node.Mapping;
 			foreach(var key_node in mapping.keys) {
@@ -304,9 +304,9 @@ throws GLib.YAML.Exception {
 					}
 				}
 			}
-			
+
 		}
-		private void process_property(Object obj, ParamSpec pspec, GLib.YAML.Node node) 
+		private void process_property(Object obj, ParamSpec pspec, GLib.YAML.Node node)
 throws GLib.YAML.Exception {
 
 			Value gvalue = Value(pspec.value_type);
@@ -391,7 +391,7 @@ throws GLib.YAML.Exception {
 			if(pspec.value_type.is_a(Type.ENUM)) {
 				weak string name = cast_to_scalar(node);
 				EnumClass eclass = (EnumClass) pspec.value_type.class_ref();
-				unowned EnumValue evalue = eclass.get_value_by_name(name);
+                unowned EnumValue? evalue = eclass.get_value_by_name(name);
 				if(evalue == null)
 					/* enum nicks are lowercase in vala*/
 					evalue = eclass.get_value_by_nick(name.down());
@@ -465,7 +465,7 @@ throws GLib.YAML.Exception {
 			return value_scalar.value;
 		}
 
-		private void process_internal_children(Object obj, GLib.YAML.Node node) 
+		private void process_internal_children(Object obj, GLib.YAML.Node node)
 		throws GLib.YAML.Exception {
 			var children = node as GLib.YAML.Node.Mapping;
 			foreach(var key_node in children.keys) {
@@ -481,7 +481,7 @@ throws GLib.YAML.Exception {
 			}
 		}
 
-		private void process_children(Object obj, string type, GLib.YAML.Node node) 
+		private void process_children(Object obj, string type, GLib.YAML.Node node)
 		throws GLib.YAML.Exception {
 			if(type == "internals") {
 				process_internal_children(obj, node);
@@ -501,8 +501,8 @@ throws GLib.YAML.Exception {
 				}
 			}
 		}
-		/** 
-		 * Obtain a built object referred by the anchor, or the root object 
+		/**
+		 * Obtain a built object referred by the anchor, or the root object
 		 * of the latest added document if anchor == null.
 		 *
 		 * @return the object referred by the anchor or the root object.
@@ -511,7 +511,7 @@ throws GLib.YAML.Exception {
 		public Object? get_object(string? anchor) {
 			if(anchor != null)
 			return anchors.lookup(anchor);
-			else 
+			else
 			return get_root_object();
 		}
 
@@ -524,10 +524,10 @@ throws GLib.YAML.Exception {
 			return document.root.get_pointer() as Object;
 		}
 		/**
-		 * Obtain a list of all objects created by the builder. The 
+		 * Obtain a list of all objects created by the builder. The
 		 * returned list should not be modified.
-		 * 
-		 * @return a read-only weak reference to the list of all objects 
+		 *
+		 * @return a read-only weak reference to the list of all objects
 		 * created by the builder.
 		 */
 		public unowned List<Object>? get_objects() {
@@ -538,9 +538,9 @@ throws GLib.YAML.Exception {
 	 * Demangle vala names to c names in the standard way.
 	 *
 	 * [warning:
-	 *   GI information is not used, therefore 
-	 *   if there is any special tricks by the CCode annotations, 
-	 *   you have to be careful and understand what you are doing. 
+	 *   GI information is not used, therefore
+	 *   if there is any special tricks by the CCode annotations,
+	 *   you have to be careful and understand what you are doing.
 	 * ]
 	 **/
 	internal static class Demangler {
@@ -580,7 +580,7 @@ throws GLib.YAML.Exception {
 					already_underscoped = false;
 					continue;
 				}
-				
+
 				if(c0 == '.') {
 					sb.append_unichar('_');
 					already_underscoped = true;
@@ -598,14 +598,14 @@ throws GLib.YAML.Exception {
 		 * Resolve a member function to a function pointer.
 		 *
 		 * @param class_name
-		 *   the name of the class, usually from GType.name(), 
+		 *   the name of the class, usually from GType.name(),
 		 * @param member_name
 		 *   the name of the member.
 		 *
 		 * @return the function pointer.
 		 */
-		public static void * resolve_function(string class_name, 
-				string member_name) 
+		public static void * resolve_function(string class_name,
+				string member_name)
 		throws GLib.YAML.Exception.DEMANGLER {
 			void * symbol;
 			StringBuilder sb = new StringBuilder("");
@@ -626,15 +626,15 @@ throws GLib.YAML.Exception {
 		/**
 		 * Resolve a GType from the class_name.
 		 *
-		 * Notice that GType.from_name is not used, instead, the get_type 
-		 * static member is called to obtain the name. 
-		 * This is necessary because the type we are looking for might 
-		 * have not yet been registered to the type system, whereas the 
-		 * get_type functions are mandatory for any GType classes. 
+		 * Notice that GType.from_name is not used, instead, the get_type
+		 * static member is called to obtain the name.
+		 * This is necessary because the type we are looking for might
+		 * have not yet been registered to the type system, whereas the
+		 * get_type functions are mandatory for any GType classes.
 		 *
 		 * @return the GType
 		 */
-		public static Type resolve_type(string class_name) 
+		public static Type resolve_type(string class_name)
 		throws GLib.YAML.Exception {
 			void* symbol = resolve_function(class_name, "get_type");
 			TypeFunc type_func = (TypeFunc) symbol;
