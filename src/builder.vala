@@ -391,7 +391,7 @@ throws GLib.YAML.Exception {
 			if(pspec.value_type.is_a(Type.ENUM)) {
 				weak string name = cast_to_scalar(node);
 				EnumClass eclass = (EnumClass) pspec.value_type.class_ref();
-				unowned EnumValue evalue = eclass.get_value_by_name(name);
+				unowned EnumValue? evalue = eclass.get_value_by_name(name);
 				if(evalue == null)
 					/* enum nicks are lowercase in vala*/
 					evalue = eclass.get_value_by_nick(name.down());

@@ -80,7 +80,7 @@ using YAML;
 						"object that is not in current namespace(%s)", prefix);
 					}
 					/* else */
-					Event.mapping_start_initialize(ref event, null, "!" + type_name.offset(prefix.length), false);
+					Event.mapping_start_initialize(ref event, null, "!" + type_name.substring(prefix.length), false);
 				} else {
 					Event.mapping_start_initialize(ref event, null, "!" + type_name, false);
 				}
@@ -212,7 +212,7 @@ using YAML;
 			if(pspec.value_type.is_a(Type.ENUM)) {
 				EnumClass eclass = (EnumClass) pspec.value_type.class_ref();
 				int e = value.get_enum();
-				unowned EnumValue evalue = eclass.get_value(e);
+				unowned EnumValue? evalue = eclass.get_value(e);
 				if(evalue != null) {
 					/* uppercase looks more enum really an issue of
 					 * vala. enum nicks are all lowercase in vala. */
@@ -250,7 +250,7 @@ using YAML;
 			Event.clean(ref event);
 		}
 		private void write_scalar(ref Event event, string str) {
-			if(null != str.chr(-1, '\n')) {
+			if(-1 != str.index_of_char(-1, '\n')) {
 				Event.scalar_initialize(ref event, null, null, str, (int)str.length, true, true,
 					ScalarStyle.LITERAL_SCALAR_STYLE);
 			} else {
