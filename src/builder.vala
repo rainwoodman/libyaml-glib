@@ -311,28 +311,28 @@ throws GLib.YAML.Exception {
 
 			Value gvalue = Value(pspec.value_type);
 			if(pspec.value_type == typeof(int)) {
-				gvalue.set_int((int)cast_to_scalar(node).to_long());
+				gvalue.set_int((int)long.parse(cast_to_scalar(node)));
 			} else
 			if(pspec.value_type == typeof(uint)) {
-				gvalue.set_uint((uint)cast_to_scalar(node).to_long());
+				gvalue.set_uint((uint)long.parse(cast_to_scalar(node)));
 			} else
 			if(pspec.value_type == typeof(long)) {
-				gvalue.set_long(cast_to_scalar(node).to_long());
+				gvalue.set_long(long.parse(cast_to_scalar(node)));
 			} else
 			if(pspec.value_type == typeof(ulong)) {
-				gvalue.set_ulong(cast_to_scalar(node).to_ulong());
+				gvalue.set_ulong((ulong)uint64.parse(cast_to_scalar(node)));
 			} else
 			if(pspec.value_type == typeof(string)) {
 				gvalue.set_string(cast_to_scalar(node));
 			} else
 			if(pspec.value_type == typeof(float)) {
-				gvalue.set_float((float)cast_to_scalar(node).to_double());
+				gvalue.set_float((float)double.parse(cast_to_scalar(node)));
 			} else
 			if(pspec.value_type == typeof(double)) {
-				gvalue.set_double(cast_to_scalar(node).to_double());
+				gvalue.set_double(double.parse(cast_to_scalar(node)));
 			} else
 			if(pspec.value_type == typeof(bool)) {
-				gvalue.set_boolean(cast_to_scalar(node).to_bool());
+				gvalue.set_boolean(bool.parse(cast_to_scalar(node)));
 			} else
 			if(pspec.value_type == typeof(Type)) {
 				gvalue.set_gtype(Demangler.resolve_type(get_full_class_name(cast_to_scalar(node))));
@@ -395,11 +395,9 @@ throws GLib.YAML.Exception {
 				if(evalue == null)
 					/* enum nicks are lowercase in vala*/
 					evalue = eclass.get_value_by_nick(name.down());
-				int e = 0;
+				int64 e = 0;
 				if(evalue == null) {
-					weak string endptr = null;
-					e = (int) name.to_int64(out endptr, 0);
-					if((void*)endptr == (void*)name) {
+					if(!int64.try_parse(name, out e)) {
 						/* not actually an integer either */
 						throw new GLib.YAML.Exception.BUILDER (
 							"%s enum value `%s' is illegal",
@@ -408,7 +406,7 @@ throws GLib.YAML.Exception {
 					}
 				} else
 					e = evalue.value;
-				gvalue.set_enum(e);
+				gvalue.set_enum((int)e);
 			} else
 			if(pspec.value_type.is_a(Type.FLAGS)) {
 				weak string expression = cast_to_scalar(node);
@@ -416,7 +414,7 @@ throws GLib.YAML.Exception {
 				string[] names = expression.split("|");
 				uint flags = 0; /* flag is 0 */
 				foreach(weak string name in names) {
-					uint f = 0;
+					int64 f = 0;
 					name._strip();
 					if(name == "~") continue; /* null = 0 */
 					/* try the full name first */
@@ -428,9 +426,7 @@ throws GLib.YAML.Exception {
 					}
 					if(v == null) {
 						/* try if his is a raw number */
-						weak string endptr = null;
-						f = (uint) name.to_int64(out endptr, 0);
-						if((void*)endptr == (void*)name) {
+						if(!int64.try_parse(name, out f)) {
 							/* not actually an integer either */
 							throw new GLib.YAML.Exception.BUILDER (
 							"%s flag value `%s' is illegal",
@@ -440,7 +436,7 @@ throws GLib.YAML.Exception {
 					} else {
 						f = v.value;
 					}
-					flags |= f;
+					flags |= (uint)f;
 				}
 				gvalue.set_flags(flags);
 			}
