@@ -284,8 +284,8 @@ throws GLib.YAML.Exception {
 				}
 				ParamSpec pspec = ((ObjectClass)obj.get_type().class_peek()).find_property(key);
 				if(pspec != null) {
-					if(0 != Buildable.get_property_hint_pspec(pspec)
-						& Buildable.PropertyHint.SKIP) {
+					if(0 != (Buildable.get_property_hint_pspec(pspec)
+						& Buildable.PropertyHint.SKIP)) {
 						throw new GLib.YAML.Exception.BUILDER(
 						"%s: trying to assign a skipped property: %s",
 						node.get_location(),
