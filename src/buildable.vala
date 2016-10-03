@@ -26,13 +26,13 @@
  ***/
 
 using YAML;
-namespace GLib.YAML {
+namespace Yaml {
 	/**
 	 * Buildable GObjects, from YAML.
 	 *
 	 *
-	 * Objects that implements GLib.YAML.Buildable is buildable by
-	 * GLib.YAML.Builder.
+	 * Objects that implements Yaml.Buildable is buildable by
+	 * Yaml.Builder.
 	 *
 	 * This interface is almost the same as GtkBuildable.
 	 *
@@ -190,10 +190,10 @@ namespace GLib.YAML {
 		 * Processing the custom node.
 		 *
 		 * @param node
-		 *   the node. It is actually a GLib.YAML.Node.
+		 *   the node. It is actually a Yaml.Node.
 		 */
-		public virtual void custom_node(Builder builder, string tag, GLib.YAML.Node node) throws GLib.Error {
-			throw new GLib.YAML.Exception.BUILDER (
+		public virtual void custom_node(Builder builder, string tag, Yaml.Node node) throws GLib.Error {
+			throw new Yaml.Exception.BUILDER (
 				"%s: Property %s.%s is not defined",
 				node.get_location(),
 				get_type().name(), tag);
