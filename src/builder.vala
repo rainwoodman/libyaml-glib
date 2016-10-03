@@ -26,11 +26,11 @@
 
 using YAML;
 
-namespace GLib.YAML {
+namespace Yaml {
 	/**
 	 * Building GObjects from a YAML stream.
 	 *
-	 * Refer to GLib.YAML.Buildable
+	 * Refer to Yaml.Buildable
 	 *
 	 * The root of the document is a mapping, which is built to an object. 
 	 * Other objects are inserted into children of the root object, 
@@ -115,7 +115,7 @@ namespace GLib.YAML {
 	 * */
 	public class Builder : GLib.Object {
 		/*If a boxed type goes beyond this size, expect to crash */
-		private static const int MAX_BOXED_SIZE = 65500;
+		private const int MAX_BOXED_SIZE = 65500;
 		[CCode (has_target = false)]
 		private delegate bool ParseFunc(string foo, void* location);
 		[CCode (has_target = false)]
@@ -124,7 +124,7 @@ namespace GLib.YAML {
 		private HashTable<string, unowned Object> anchors = new HashTable<string, unowned Object>.full(str_hash, str_equal, g_free, null);
 		private List<Object> objects;
 
-		private GLib.YAML.Document document;
+		private Yaml.Document document;
 		/**
 		 * Create a builder with the given prefix.
 		 **/
@@ -134,22 +134,20 @@ namespace GLib.YAML {
 		/**
 		 * Add objects from a string
 		 **/
-		public void add_from_string(string str) 
-throws GLib.YAML.Exception {
+		public void add_from_string(string str) throws Yaml.Exception {
 			warning("this function is deprecated.");
 			assert(document == null);
-			document = new GLib.YAML.Document.from_string(str);
+			document = new Yaml.Document.from_string(str);
 			bootstrap_objects(document);
 			process_value_nodes();
 		}
 		/**
 		 * Add objects from a file stream
 		 **/
-		public void add_from_file (FileStream file) 
-throws GLib.YAML.Exception {
+		public void add_from_file (FileStream file) throws Yaml.Exception {
 			warning("this function is deprecated.");
 			assert(document == null);
-			document = new GLib.YAML.Document.from_file(file);
+			document = new Yaml.Document.from_file(file);
 			bootstrap_objects(document);
 			process_value_nodes();
 		}
@@ -157,10 +155,9 @@ throws GLib.YAML.Exception {
 		/**
 		 * Build an object from a given string
 		 **/
-		public Object? build_from_string(string str) 
-throws GLib.YAML.Exception {
+		public Object? build_from_string(string str) throws Yaml.Exception {
 			document = null;
-			document = new GLib.YAML.Document.from_string(str);
+			document = new Yaml.Document.from_string(str);
 			bootstrap_objects(document);
 			process_value_nodes();
 			return get_root_object();
@@ -169,10 +166,9 @@ throws GLib.YAML.Exception {
 		/**
 		 * Build an object from a given filestream
 		 **/
-		public Object? build_from_file(FileStream file) 
-throws GLib.YAML.Exception {
+		public Object? build_from_file(FileStream file) throws Yaml.Exception {
 			document = null;
-			document = new GLib.YAML.Document.from_file(file);
+			document = new Yaml.Document.from_file(file);
 			bootstrap_objects(document);
 			process_value_nodes();
 			return get_root_object();
@@ -200,8 +196,7 @@ throws GLib.YAML.Exception {
 		 *
 		 * @return the built object
 		 */
-		public Object build_object(GLib.YAML.Node node, Type type) 
-		throws GLib.YAML.Exception {
+		public Object build_object(Yaml.Node node, Type type) throws Yaml.Exception {
 			if(node.get_pointer() != null) {
 				return (Object) node.get_pointer();
 			}
@@ -217,33 +212,28 @@ throws GLib.YAML.Exception {
 				return class_name;
 		}
 
-		private void bootstrap_objects(GLib.YAML.Document document) 
-		
-throws GLib.YAML.Exception {
+		private void bootstrap_objects(Yaml.Document document) throws Yaml.Exception {
 			foreach(var node in document.nodes) {
 				/* skip non objects */
-				if(!(node is GLib.YAML.Node.Mapping)) continue;
+				if(!(node is Yaml.Node.Mapping)) continue;
 				if(node.tag.get_char() != '!') continue;
 				/* bootstrap all objects with sufficient information */
 				bootstrap_object(node);
 			}
 		}
 
-		private void process_value_nodes() 
-throws GLib.YAML.Exception {
+		private void process_value_nodes() throws Yaml.Exception {
 			foreach(var obj in objects) {
-				var node = obj.get_data<GLib.YAML.Node>("node");
+				var node = obj.get_data<Yaml.Node>("node");
 				process_object_value_node(obj, node);
 			}
-			
 		}
 
 		/* 
 		 * Build a object without setting its properties and children, 
 		 * if type == Type.INVALID, the type is deducted from the node.tag.
 		 */
-		private Object bootstrap_object(GLib.YAML.Node node, Type type = Type.INVALID) 
-		throws GLib.YAML.Exception {
+		private Object bootstrap_object(Yaml.Node node, Type type = Type.INVALID) throws Yaml.Exception {
 			string real_name = get_full_class_name(node.tag.next_char());
 			if(node.get_pointer() != null) {
 				return (Object) node.get_pointer();
@@ -272,9 +262,8 @@ throws GLib.YAML.Exception {
 			return type;
 		}
 
-		private void process_object_value_node(Object obj, GLib.YAML.Node node) 
-throws GLib.YAML.Exception {
-			var mapping = node as GLib.YAML.Node.Mapping;
+		private void process_object_value_node(Object obj, Yaml.Node node) throws Yaml.Exception {
+			var mapping = node as Yaml.Node.Mapping;
 			foreach(var key_node in mapping.keys) {
 				weak string key = cast_to_scalar(key_node);
 				var value_node = mapping.pairs.lookup(key_node).get_resolved();
@@ -286,7 +275,7 @@ throws GLib.YAML.Exception {
 				if(pspec != null) {
 					if(0 != (Buildable.get_property_hint_pspec(pspec)
 						& Buildable.PropertyHint.SKIP)) {
-						throw new GLib.YAML.Exception.BUILDER(
+						throw new Yaml.Exception.BUILDER(
 						"%s: trying to assign a skipped property: %s",
 						node.get_location(),
 						pspec.name);
@@ -297,18 +286,16 @@ throws GLib.YAML.Exception {
 					try {
 						((Buildable*) obj)->custom_node(this, key, value_node);
 					} catch (GLib.Error e) {
-						throw new GLib.YAML.Exception.BUILDER(
+						throw new Yaml.Exception.BUILDER(
 						"%s: custom_node error: %s",
 						node.get_location(),
 						e.message);
 					}
 				}
 			}
-			
 		}
-		private void process_property(Object obj, ParamSpec pspec, GLib.YAML.Node node) 
-throws GLib.YAML.Exception {
 
+		private void process_property(Object obj, ParamSpec pspec, Yaml.Node node) throws Yaml.Exception {
 			Value gvalue = Value(pspec.value_type);
 			if(pspec.value_type == typeof(int)) {
 				gvalue.set_int((int)long.parse(cast_to_scalar(node)));
@@ -342,16 +329,16 @@ throws GLib.YAML.Exception {
 				if(node is Node.Scalar) {
 					ref_obj = get_object(cast_to_scalar(node));
 					if(ref_obj == null) {
-						throw new GLib.YAML.Exception.BUILDER (
+						throw new Yaml.Exception.BUILDER (
 							"%s: Object '%s' not found",
 							node.get_location(),
 							cast_to_scalar(node));
 					}
 				} else
-				if(node is GLib.YAML.Node.Mapping) {
+				if(node is Yaml.Node.Mapping) {
 					ref_obj = build_object(node, pspec.value_type);
 				} else {
-					throw new GLib.YAML.Exception.BUILDER (
+					throw new Yaml.Exception.BUILDER (
 						"%s: Excecting Scaler or Mapping for type `%s'",
 						node.get_location(),
 						pspec.name);
@@ -366,26 +353,26 @@ throws GLib.YAML.Exception {
 					NewFunc new_func = (NewFunc) new_symbol;
 					void* memory = new_func(strval);
 					if(memory == null) {
-						throw new GLib.YAML.Exception.BUILDER (
-						"%s: boxed type `%s' parser failed",
+						throw new Yaml.Exception.BUILDER (
+						"%s: boxed type `%s' parser failed around `%s'",
 						node.get_location(),
 						pspec.value_type.name(),
 						node.start_mark.to_string());
 					}
-					g_value_take_boxed(ref gvalue, memory);
-				} catch (GLib.YAML.Exception.DEMANGLER e) {
+					memory = gvalue.get_boxed();
+				} catch (Yaml.Exception.DEMANGLER e) {
 					void * parse_symbol = Demangler.resolve_function(pspec.value_type.name(), "parse");
 					ParseFunc parse_func = (ParseFunc) parse_symbol;
 					void* memory = (void*) new char[MAX_BOXED_SIZE];
 					warning("Allocating %d bytes for Boxed type %s.",
 					MAX_BOXED_SIZE, pspec.value_type.name());
 					if(!parse_func(strval, memory)) {
-						throw new GLib.YAML.Exception.BUILDER (
+						throw new Yaml.Exception.BUILDER (
 						"%s: Boxed type `%s' parser failed",
 						node.get_location(),
 						pspec.value_type.name());
 					}
-					g_value_take_boxed(ref gvalue, memory);
+					memory = gvalue.get_boxed();
 				}
 			}  else
 			if(pspec.value_type.is_a(Type.ENUM)) {
@@ -399,7 +386,7 @@ throws GLib.YAML.Exception {
 				if(evalue == null) {
 					if(!int64.try_parse(name, out e)) {
 						/* not actually an integer either */
-						throw new GLib.YAML.Exception.BUILDER (
+						throw new Yaml.Exception.BUILDER (
 							"%s enum value `%s' is illegal",
 							node.get_location(),
 							name);
@@ -418,7 +405,7 @@ throws GLib.YAML.Exception {
 					name._strip();
 					if(name == "~") continue; /* null = 0 */
 					/* try the full name first */
-					unowned FlagsValue v = klass.get_value_by_name(name);
+					unowned FlagsValue? v = klass.get_value_by_name(name);
 					if(v == null) {
 					/* try the nick next */
 					/* flags nicks are lowercase in vala, try the nick*/
@@ -428,7 +415,7 @@ throws GLib.YAML.Exception {
 						/* try if his is a raw number */
 						if(!int64.try_parse(name, out f)) {
 							/* not actually an integer either */
-							throw new GLib.YAML.Exception.BUILDER (
+							throw new Yaml.Exception.BUILDER (
 							"%s flag value `%s' is illegal",
 								node.get_location(),
 								name);
@@ -441,7 +428,7 @@ throws GLib.YAML.Exception {
 				gvalue.set_flags(flags);
 			}
 			else {
-				throw new GLib.YAML.Exception.UNIMPLEMENTED (
+				throw new Yaml.Exception.UNIMPLEMENTED (
 					"%s: Property `%s' type `%s' in unimplemented",
 					node.get_location(),
 					pspec.name,
@@ -450,26 +437,24 @@ throws GLib.YAML.Exception {
 			obj.set_property(pspec.name, gvalue);
 		}
 
-		private unowned string cast_to_scalar(GLib.YAML.Node node)
-		throws GLib.YAML.Exception {
-			var value_scalar = (node as GLib.YAML.Node.Scalar);
+		private unowned string cast_to_scalar(Yaml.Node node) throws Yaml.Exception {
+			var value_scalar = (node as Yaml.Node.Scalar);
 			if(value_scalar == null) {
-				throw new GLib.YAML.Exception.BUILDER (
+				throw new Yaml.Exception.BUILDER (
 					"%s: Expecting scalar.",
 					node.get_location());
 			}
 			return value_scalar.value;
 		}
 
-		private void process_internal_children(Object obj, GLib.YAML.Node node) 
-		throws GLib.YAML.Exception {
-			var children = node as GLib.YAML.Node.Mapping;
+		private void process_internal_children(Object obj, Yaml.Node node) throws Yaml.Exception {
+			var children = node as Yaml.Node.Mapping;
 			foreach(var key_node in children.keys) {
 				var key = cast_to_scalar(key_node);
 				var value_node = children.pairs.lookup(key_node).get_resolved();
 				Object child = ((Buildable*) obj)->get_internal_child(this, key);
 				if(child == null) {
-					throw new GLib.YAML.Exception.BUILDER (
+					throw new Yaml.Exception.BUILDER (
 					"%s: Expecting internal child `%s'",
 					node.get_location(), key);
 				}
@@ -477,20 +462,19 @@ throws GLib.YAML.Exception {
 			}
 		}
 
-		private void process_children(Object obj, string type, GLib.YAML.Node node) 
-		throws GLib.YAML.Exception {
+		private void process_children(Object obj, string type, Yaml.Node node) throws Yaml.Exception {
 			if(type == "internals") {
 				process_internal_children(obj, node);
 				return;
 			}
-			var children = node as GLib.YAML.Node.Sequence;
+			var children = node as Yaml.Node.Sequence;
 			foreach(var item in children.items) {
 				var child = build_object(item.get_resolved(), ((Buildable*)obj)->get_child_type(this, type));
 				assert(child != null);
 				try {
 					((Buildable*)obj)->add_child(this, child, type);
 				} catch (GLib.Error e) {
-					throw new GLib.YAML.Exception.BUILDER(
+					throw new Yaml.Exception.BUILDER(
 					"%s: add_child error %s",
 					node.get_location(),
 					e.message);
@@ -539,7 +523,7 @@ throws GLib.YAML.Exception {
 	 *   you have to be careful and understand what you are doing. 
 	 * ]
 	 **/
-	internal static class Demangler {
+	internal class Demangler {
 		/**
 		 * A yet powerful Vala type name to c name demangler.
 		 *
@@ -601,8 +585,7 @@ throws GLib.YAML.Exception {
 		 * @return the function pointer.
 		 */
 		public static void * resolve_function(string class_name, 
-				string member_name) 
-		throws GLib.YAML.Exception.DEMANGLER {
+				string member_name) throws Yaml.Exception.DEMANGLER {
 			void * symbol;
 			StringBuilder sb = new StringBuilder("");
 			sb.append(Demangler.demangle(class_name));
@@ -611,7 +594,7 @@ throws GLib.YAML.Exception {
 			string func_name = sb.str;
 			Module self = Module.open(null, 0);
 			if(!self.symbol(func_name, out symbol)) {
-				throw new GLib.YAML.Exception.DEMANGLER (
+				throw new Yaml.Exception.DEMANGLER (
 					"Symbol %s.%s (%s) not found",
 					class_name, member_name, func_name);
 			}
@@ -630,8 +613,7 @@ throws GLib.YAML.Exception {
 		 *
 		 * @return the GType
 		 */
-		public static Type resolve_type(string class_name) 
-		throws GLib.YAML.Exception {
+		public static Type resolve_type(string class_name) throws Yaml.Exception {
 			void* symbol = resolve_function(class_name, "get_type");
 			TypeFunc type_func = (TypeFunc) symbol;
 			return type_func();

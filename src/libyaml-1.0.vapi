@@ -249,7 +249,7 @@ namespace YAML {
 	}
 
 	/** Many bad things could happen with the parser and emitter. */
-	[CCode (cname="yaml_error_type_t", prefix="YAML_", has_type_id=false)]
+	[CCode (cname="yaml_error_type_t", cprefix="YAML_", has_type_id=false)]
 	public enum ErrorType {
 		NO_ERROR,
 

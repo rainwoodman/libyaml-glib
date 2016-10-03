@@ -33,7 +33,7 @@ using YAML;
  * libyaml is used for parsing and emitting events.
  *
  */
-namespace GLib.YAML {
+namespace Yaml {
 	/**
 	 * A YAML Node.
 	 *
@@ -50,7 +50,7 @@ namespace GLib.YAML {
 	 * YAML data.
 	 *
 	 * A pointer can be binded to the node with get_pointer and set_pointer.
-	 * This pointer is used by GLib.YAML.Builder to hold the built object.
+	 * This pointer is used by Yaml.Builder to hold the built object.
 	 *
 	 * */
 	public class Node {
@@ -202,7 +202,7 @@ namespace GLib.YAML {
 		 * Create a document from a parser
 		 * */
 		public Document.from_parser(ref Parser parser)
-		throws GLib.YAML.Exception {
+		throws Yaml.Exception {
 			Loader loader = new Loader();
 			loader.load(ref parser, this);
 		}
@@ -211,7 +211,7 @@ namespace GLib.YAML {
 		 * Create a document from a string
 		 * */
 		public Document.from_string(string str)
-		throws GLib.YAML.Exception {
+		throws Yaml.Exception {
 			Loader loader = new Loader();
 			Parser parser = Parser();
 			parser.set_input_string(str, str.length);
@@ -222,7 +222,7 @@ namespace GLib.YAML {
 		 * Create a document from a file stream
 		 * */
 		public Document.from_file(FileStream file)
-		throws GLib.YAML.Exception {
+		throws Yaml.Exception {
 			Loader loader = new Loader();
 			Parser parser = Parser();
 			parser.set_input_file(file);

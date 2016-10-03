@@ -23,7 +23,7 @@
  ***/
 
 using YAML;
-public errordomain GLib.YAML.Exception {
+public errordomain Yaml.Exception {
 	INTERNAL,
 	WRITER,
 	LOADER,

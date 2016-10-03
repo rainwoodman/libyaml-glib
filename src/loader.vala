@@ -32,14 +32,14 @@ using YAML;
 	/**
 	 * Internal class used to load the document
 	 */
-	internal class GLib.YAML.Loader {
+	internal class Yaml.Loader {
 		public Loader() {}
 		private void parse_with_throw(ref Parser parser, out Event event)
-		throws GLib.YAML.Exception {
+		throws Yaml.Exception {
 			if(parser.parse(out event)) {
 				return;
 			}
-			throw new GLib.YAML.Exception.INTERNAL (
+			throw new Yaml.Exception.INTERNAL (
 			"Parser encounters an error: %s at %u(%s)\n"
 			+ "Error Context: '%s'",
 				parser.problem,
@@ -55,7 +55,7 @@ using YAML;
 		 * Alias are looked up at the very end of the stage.
 		 */
 		public bool load(ref Parser parser, Document document) 
-		throws GLib.YAML.Exception {
+		throws Yaml.Exception {
 			this.document = document;
 			Event event;
 			/* Look for a StreamStart */
@@ -92,7 +92,7 @@ using YAML;
 				var alias_node = node as Node.Alias;
 				alias_node.node = document.anchors.lookup(alias_node.anchor);
 				if(alias_node != null) continue;
-				throw new GLib.YAML.Exception.LOADER (
+				throw new Yaml.Exception.LOADER (
 					"Alias '%s' cannot be resolved.",
 					alias_node.anchor);
 			}
@@ -104,7 +104,7 @@ using YAML;
 		 * @return the loaded node.
 		 */
 		public Node load_node(ref Parser parser, ref Event last_event) 
-		throws GLib.YAML.Exception {
+		throws Yaml.Exception {
 			switch(last_event.type) {
 				case EventType.ALIAS_EVENT:
 					return load_alias(ref parser, ref last_event);
@@ -119,7 +119,7 @@ using YAML;
 			}
 		}
 		public Node? load_alias(ref Parser parser, ref Event event)
-		throws GLib.YAML.Exception {
+		throws Yaml.Exception {
 			Node.Alias node = new Node.Alias();
 			node.anchor = event.data.alias.anchor;
 
@@ -136,7 +136,7 @@ using YAML;
 			return tag;
 		}
 		public Node? load_scalar(ref Parser parser, ref Event event)
-		throws GLib.YAML.Exception {
+		throws Yaml.Exception {
 			Node.Scalar node = new Node.Scalar();
 			node.anchor = event.data.scalar.anchor;
 			node.tag = normalize_tag(event.data.scalar.tag,
@@ -154,7 +154,7 @@ using YAML;
 			return node;
 		}
 		public Node? load_sequence(ref Parser parser, ref Event event)
-		throws GLib.YAML.Exception {
+		throws Yaml.Exception {
 			Node.Sequence node = new Node.Sequence();
 			node.anchor = event.data.sequence_start.anchor;
 			node.tag = normalize_tag(event.data.sequence_start.tag,
@@ -186,7 +186,7 @@ using YAML;
 			return node;
 		}
 		public Node? load_mapping(ref Parser parser, ref Event event)
-		throws GLib.YAML.Exception {
+		throws Yaml.Exception {
 			Node.Mapping node = new Node.Mapping();
 			node.tag = normalize_tag(event.data.mapping_start.tag,
 					DEFAULT_MAPPING_TAG);

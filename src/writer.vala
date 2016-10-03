@@ -29,7 +29,7 @@ using YAML;
 	 * For a BoxedType, implement a _to_string() member to
 	 * return a newly allocated string represention of the object.
 	 */
-	public class GLib.YAML.Writer {
+	public class Yaml.Writer {
 		[CCode (has_target = false)]
 		private delegate string StringFunc(void* boxed);
 		public Writer(string? prefix = null) {
@@ -41,7 +41,7 @@ using YAML;
 		private unowned StringBuilder sb = null;
 		Emitter emitter;
 
-		public void stream_object(Object object, StringBuilder sb) throws GLib.YAML.Exception {
+		public void stream_object(Object object, StringBuilder sb) throws Yaml.Exception {
 			Event event = {0};
 			this.sb = sb;
 			sb.truncate(0);
@@ -56,7 +56,7 @@ using YAML;
 
 			try {
 				write_object(object, true);
-			} catch (GLib.YAML.Exception e) {
+			} catch (Yaml.Exception e) {
 				throw e;
 			} finally {
 				Event.document_end_initialize(ref event);
@@ -70,13 +70,13 @@ using YAML;
 			return;
 		}
 		private void write_object(Object object, bool write_type_tag = false)
-		throws GLib.YAML.Exception {
+		throws Yaml.Exception {
 			Event event = {0};
 			if(write_type_tag) {
 				string type_name = object.get_type().name();
 				if(prefix != null) {
 					if(!type_name.has_prefix(prefix)) {
-						throw new GLib.YAML.Exception.WRITER (
+						throw new Yaml.Exception.WRITER (
 						"object that is not in current namespace(%s)", prefix);
 					}
 					/* else */
@@ -115,7 +115,7 @@ using YAML;
 		}
 
 		private void write_children(Buildable buildable, string tag, Type type)
-		throws GLib.YAML.Exception {
+		throws Yaml.Exception {
 			Event event = {0};
 			Event.scalar_initialize(ref event, null, null, tag, (int)tag.length);
 			emitter.emit(ref event);
@@ -136,7 +136,7 @@ using YAML;
 		}
 
 		private void write_property(Object object, ParamSpec pspec) 
-		throws GLib.YAML.Exception {
+		throws Yaml.Exception {
 			Event event = {0};
 			Event.scalar_initialize(ref event, null, null, pspec.name, (int)pspec.name.length);
 			emitter.emit(ref event);
@@ -243,7 +243,7 @@ using YAML;
 				}
 			}
 			else {
-				throw new GLib.YAML.Exception.WRITER (
+				throw new Yaml.Exception.WRITER (
 					"Unhandled property type %s",
 					pspec.value_type.name());
 			}

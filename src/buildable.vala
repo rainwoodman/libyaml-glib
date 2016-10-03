@@ -26,13 +26,13 @@
  ***/
 
 using YAML;
-namespace GLib.YAML {
+namespace Yaml {
 	/**
 	 * Buildable GObjects, from YAML.
 	 *
 	 *
-	 * Objects that implements GLib.YAML.Buildable is buildable by
-	 * GLib.YAML.Builder.
+	 * Objects that implements Yaml.Buildable is buildable by
+	 * Yaml.Builder.
 	 *
 	 * This interface is almost the same as GtkBuildable.
 	 *
@@ -83,10 +83,10 @@ namespace GLib.YAML {
 		public static void register_type (
 			Type type,
 			string[] child_tags, Type[] types) {
-			g_type_set_qdata(type, Quark.from_string("buildable-child-tags"), child_tags);
-			g_type_set_qdata(type, Quark.from_string("buildable-child-tags-len"), (void*) child_tags.length);
-			g_type_set_qdata(type, Quark.from_string("buildable-child-types"), types);
-			g_type_set_qdata(type, Quark.from_string("buildable-child-types-len"), (void*) types.length);
+			type.set_qdata(Quark.from_string("buildable-child-tags"), child_tags);
+			type.set_qdata(Quark.from_string("buildable-child-tags-len"), (void*) child_tags.length);
+			type.set_qdata(Quark.from_string("buildable-child-types"), types);
+			type.set_qdata(Quark.from_string("buildable-child-types-len"), (void*) types.length);
 		}
 
 		/**
@@ -125,19 +125,19 @@ namespace GLib.YAML {
 		 * the returned array should not be freed/modified.
 		 * */
 		public unowned string[]? get_child_tags() {
-			void * pointer = g_type_get_qdata(this.get_type(), 
+			void * pointer = this.get_type().get_qdata(
 				Quark.from_string("buildable-child-tags"));
 			unowned string[] tags = (string[]) pointer;
-			tags.length = (int) g_type_get_qdata(this.get_type(), 
+			tags.length = (int) this.get_type().get_qdata(
 				Quark.from_string("buildable-child-tags-len"));
 			return tags;
 		}
 
 		public unowned Type[]? get_child_types() {
-			void * pointer = g_type_get_qdata(this.get_type(), 
+			void * pointer = this.get_type().get_qdata(
 				Quark.from_string("buildable-child-types"));
 			unowned Type[] types = (Type[]) pointer;
-			types.length = (int) g_type_get_qdata(this.get_type(), 
+			types.length = (int) this.get_type().get_qdata(
 				Quark.from_string("buildable-child-types-len"));
 			return types;
 		}
@@ -190,10 +190,10 @@ namespace GLib.YAML {
 		 * Processing the custom node.
 		 *
 		 * @param node
-		 *   the node. It is actually a GLib.YAML.Node.
+		 *   the node. It is actually a Yaml.Node.
 		 */
-		public virtual void custom_node(Builder builder, string tag, GLib.YAML.Node node) throws GLib.Error {
-			throw new GLib.YAML.Exception.BUILDER (
+		public virtual void custom_node(Builder builder, string tag, Yaml.Node node) throws GLib.Error {
+			throw new Yaml.Exception.BUILDER (
 				"%s: Property %s.%s is not defined",
 				node.get_location(),
 				get_type().name(), tag);
