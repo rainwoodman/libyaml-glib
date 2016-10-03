@@ -115,7 +115,7 @@ namespace GLib.YAML {
 	 * */
 	public class Builder : GLib.Object {
 		/*If a boxed type goes beyond this size, expect to crash */
-		private static const int MAX_BOXED_SIZE = 65500;
+		private const int MAX_BOXED_SIZE = 65500;
 		[CCode (has_target = false)]
 		private delegate bool ParseFunc(string foo, void* location);
 		[CCode (has_target = false)]
@@ -367,12 +367,12 @@ throws GLib.YAML.Exception {
 					void* memory = new_func(strval);
 					if(memory == null) {
 						throw new GLib.YAML.Exception.BUILDER (
-						"%s: boxed type `%s' parser failed",
+						"%s: boxed type `%s' parser failed around `%s'",
 						node.get_location(),
 						pspec.value_type.name(),
 						node.start_mark.to_string());
 					}
-					g_value_take_boxed(ref gvalue, memory);
+					memory = gvalue.get_boxed();
 				} catch (GLib.YAML.Exception.DEMANGLER e) {
 					void * parse_symbol = Demangler.resolve_function(pspec.value_type.name(), "parse");
 					ParseFunc parse_func = (ParseFunc) parse_symbol;
@@ -385,7 +385,7 @@ throws GLib.YAML.Exception {
 						node.get_location(),
 						pspec.value_type.name());
 					}
-					g_value_take_boxed(ref gvalue, memory);
+					memory = gvalue.get_boxed();
 				}
 			}  else
 			if(pspec.value_type.is_a(Type.ENUM)) {
@@ -418,7 +418,7 @@ throws GLib.YAML.Exception {
 					name._strip();
 					if(name == "~") continue; /* null = 0 */
 					/* try the full name first */
-					unowned FlagsValue v = klass.get_value_by_name(name);
+					unowned FlagsValue? v = klass.get_value_by_name(name);
 					if(v == null) {
 					/* try the nick next */
 					/* flags nicks are lowercase in vala, try the nick*/
@@ -539,7 +539,7 @@ throws GLib.YAML.Exception {
 	 *   you have to be careful and understand what you are doing. 
 	 * ]
 	 **/
-	internal static class Demangler {
+	internal class Demangler {
 		/**
 		 * A yet powerful Vala type name to c name demangler.
 		 *

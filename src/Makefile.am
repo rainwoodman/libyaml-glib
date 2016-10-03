@@ -11,8 +11,8 @@ BUILT_SOURCES = vala-ccode vala-doc
 
 $(DIST_SOURCES): vala-ccode
 
-vala-ccode: $(VALASOURCES) libyaml-1.0.vapi workaround.vapi
-	$(VALAC) -g --library libyaml-glib-1.0 -H libyaml-glib-1.0.h -C $(VALASOURCES) libyaml-1.0.vapi --pkg gmodule-2.0 workaround.vapi
+vala-ccode: $(VALASOURCES) libyaml-1.0.vapi
+	$(VALAC) -g --library libyaml-glib-1.0 -H libyaml-glib-1.0.h -C $(VALASOURCES) libyaml-1.0.vapi --pkg gmodule-2.0
 	echo libyaml-1.0 > libyaml-glib-1.0.deps
 	touch $@
 
@@ -32,7 +32,6 @@ pkginclude_HEADERS = libyaml-glib-1.0.h \
                      $(top_srcdir)/libyaml/include/yaml.h
 
 EXTRA_DIST = libyaml-1.0.vapi \
-             workaround.vapi \
              $(VALASOURCES) \
              libyaml-glib-1.0.vapi \
              libyaml-glib-1.0.deps \
