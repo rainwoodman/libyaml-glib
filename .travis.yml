@@ -1,0 +1,22 @@
+dist: trusty
+
+language: c
+
+cache:
+    - ccache
+
+compiler:
+    - gcc
+
+before_install:
+    - sudo add-apt-repository --yes ppa:vala-team
+    - sudo apt-get update --quiet
+    - sudo apt-get install --yes --force-yes build-essential libglib2.0-dev
+      libyaml-dev valac valadoc
+
+before_script:
+    - ./autogen.sh
+    - make
+
+script:
+    - make check
