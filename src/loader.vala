@@ -121,7 +121,7 @@ using YAML;
 		public Node? load_alias(ref Parser parser, ref Event event)
 		throws Yaml.Exception {
 			Node.Alias node = new Node.Alias();
-			node.anchor = event.data.alias.anchor;
+			node.anchor = event.alias.anchor;
 
 			/* Push the node to the document stack
 			 * Do not register the anchor because it is an alias */
@@ -138,11 +138,11 @@ using YAML;
 		public Node? load_scalar(ref Parser parser, ref Event event)
 		throws Yaml.Exception {
 			Node.Scalar node = new Node.Scalar();
-			node.anchor = event.data.scalar.anchor;
-			node.tag = normalize_tag(event.data.scalar.tag,
+			node.anchor = event.scalar.anchor;
+			node.tag = normalize_tag(event.scalar.tag,
 					DEFAULT_SCALAR_TAG);
-			node.value = event.data.scalar.value;
-			node.style = event.data.scalar.style;
+			node.value = event.scalar.value;
+			node.style = event.scalar.style;
 			node.start_mark = event.start_mark;
 			node.end_mark = event.end_mark;
 
@@ -156,10 +156,10 @@ using YAML;
 		public Node? load_sequence(ref Parser parser, ref Event event)
 		throws Yaml.Exception {
 			Node.Sequence node = new Node.Sequence();
-			node.anchor = event.data.sequence_start.anchor;
-			node.tag = normalize_tag(event.data.sequence_start.tag,
+			node.anchor = event.sequence_start.anchor;
+			node.tag = normalize_tag(event.sequence_start.tag,
 					DEFAULT_SEQUENCE_TAG);
-			node.style = event.data.sequence_start.style;
+			node.style = event.sequence_start.style;
 			node.start_mark = event.start_mark;
 			node.end_mark = event.end_mark;
 
@@ -188,10 +188,10 @@ using YAML;
 		public Node? load_mapping(ref Parser parser, ref Event event)
 		throws Yaml.Exception {
 			Node.Mapping node = new Node.Mapping();
-			node.tag = normalize_tag(event.data.mapping_start.tag,
+			node.tag = normalize_tag(event.mapping_start.tag,
 					DEFAULT_MAPPING_TAG);
-			node.anchor = event.data.mapping_start.anchor;
-			node.style = event.data.mapping_start.style;
+			node.anchor = event.mapping_start.anchor;
+			node.style = event.mapping_start.style;
 			node.start_mark = event.start_mark;
 			node.end_mark = event.end_mark;
 

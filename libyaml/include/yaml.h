@@ -390,13 +390,13 @@ typedef struct yaml_event_s {
     union {
         
         /** The stream parameters (for @c YAML_STREAM_START_EVENT). */
-        struct {
+        struct yaml_event_stream_start {
             /** The document encoding. */
             yaml_encoding_t encoding;
         } stream_start;
 
         /** The document parameters (for @c YAML_DOCUMENT_START_EVENT). */
-        struct {
+        struct yaml_event_document_start {
             /** The version directive. */
             yaml_version_directive_t *version_directive;
 
@@ -413,19 +413,19 @@ typedef struct yaml_event_s {
         } document_start;
 
         /** The document end parameters (for @c YAML_DOCUMENT_END_EVENT). */
-        struct {
+        struct yaml_event_document_end {
             /** Is the document end indicator implicit? */
             int implicit;
         } document_end;
 
         /** The alias parameters (for @c YAML_ALIAS_EVENT). */
-        struct {
+        struct yaml_event_alias {
             /** The anchor. */
             yaml_char_t *anchor;
         } alias;
 
         /** The scalar parameters (for @c YAML_SCALAR_EVENT). */
-        struct {
+        struct yaml_event_scalar {
             /** The anchor. */
             yaml_char_t *anchor;
             /** The tag. */
@@ -443,7 +443,7 @@ typedef struct yaml_event_s {
         } scalar;
 
         /** The sequence parameters (for @c YAML_SEQUENCE_START_EVENT). */
-        struct {
+        struct yaml_event_sequence_start {
             /** The anchor. */
             yaml_char_t *anchor;
             /** The tag. */
@@ -455,7 +455,7 @@ typedef struct yaml_event_s {
         } sequence_start;
 
         /** The mapping parameters (for @c YAML_MAPPING_START_EVENT). */
-        struct {
+        struct yaml_event_mapping_start {
             /** The anchor. */
             yaml_char_t *anchor;
             /** The tag. */
@@ -474,6 +474,14 @@ typedef struct yaml_event_s {
     yaml_mark_t end_mark;
 
 } yaml_event_t;
+
+typedef struct yaml_event_stream_start yaml_event_stream_start_t;
+typedef struct yaml_event_document_start yaml_event_document_start_t;
+typedef struct yaml_event_document_end yaml_event_document_end_t;
+typedef struct yaml_event_sequence_start yaml_event_sequence_start_t;
+typedef struct yaml_event_mapping_start yaml_event_mapping_start_t;
+typedef struct yaml_event_alias yaml_event_alias_t;
+typedef struct yaml_event_scalar yaml_event_scalar_t;
 
 /**
  * Create the STREAM-START event.
