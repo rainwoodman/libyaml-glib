@@ -138,12 +138,12 @@ namespace YAML {
 		MAPPING_END_EVENT
 	}
 
-	[CCode (has_type_id = false)]
+	[CCode (cname="yaml_event_alias_t", has_type_id = false)]
 	public struct EventAlias {
 		public string anchor;
 	}
 
-	[CCode (has_type_id = false)]
+	[CCode (cname="yaml_event_sequence_start_t", has_type_id = false)]
 	public struct EventSequenceStart {
 		public string anchor;
 		public string tag;
@@ -151,7 +151,7 @@ namespace YAML {
 		public YAML.SequenceStyle style;
 	}
 
-	[CCode (has_type_id = false)]
+	[CCode (cname="yaml_event_mapping_start_t", has_type_id = false)]
 	public struct EventMappingStart {
 		public string anchor;
 		public string tag;
@@ -162,7 +162,7 @@ namespace YAML {
 	/** 
 	 * The scalar parameters (for @c YAML_SCALAR_EVENT). 
 	 * */
-	[CCode (has_type_id = false)]
+	[CCode (cname="yaml_event_scalar_t", has_type_id = false)]
 	public struct EventScalar {
 		/* The anchor. */
 		public string anchor;
@@ -179,7 +179,7 @@ namespace YAML {
 		public ScalarStyle style;
 	}
 
-	[CCode (has_type_id=false)]
+	[CCode (cname="yaml_event_data_t", has_type_id = false)]
 	public struct EventData {
 		public YAML.EventAlias alias;
 		public YAML.EventScalar scalar;
@@ -227,7 +227,14 @@ namespace YAML {
 			event.type = YAML.EventType.NO_EVENT;
 		}
 		public EventType type;
-		public YAML.EventData data;
+        [CCode (cname="data.alias")]
+		public YAML.EventAlias alias;
+        [CCode (cname="data.scalar")]
+		public YAML.EventScalar scalar;
+        [CCode (cname="data.sequence_start")]
+		public YAML.EventSequenceStart sequence_start;
+        [CCode (cname="data.mapping_start")]
+		public YAML.EventMappingStart mapping_start;
 		public Mark start_mark;
 		public Mark end_mark;
 
