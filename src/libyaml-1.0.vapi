@@ -138,53 +138,61 @@ namespace YAML {
 		MAPPING_END_EVENT
 	}
 
-	[CCode (cname="yaml_event_alias_t", has_type_id = false)]
-	public struct EventAlias {
+	[CCode (cname="yaml_event_t", has_type_id = false)]
+	public struct EventAlias : Event {
+		[CCode (cname="data.alias.anchor")]
 		public string anchor;
 	}
 
-	[CCode (cname="yaml_event_sequence_start_t", has_type_id = false)]
-	public struct EventSequenceStart {
+	[CCode (cname="yaml_event_t", has_type_id = false)]
+	public struct EventSequenceStart : Event {
+		[CCode (cname="data.sequence_start.anchor")]
 		public string anchor;
+		[CCode (cname="data.sequence_start.tag")]
 		public string tag;
+		[CCode (cname="data.sequence_start.implicity")]
 		public int implicity;
+		[CCode (cname="data.sequence_start.style")]
 		public YAML.SequenceStyle style;
 	}
 
-	[CCode (cname="yaml_event_mapping_start_t", has_type_id = false)]
-	public struct EventMappingStart {
+	[CCode (cname="yaml_event_t", has_type_id = false)]
+	public struct EventMappingStart : Event {
+		[CCode (cname="data.mapping_start.anchor")]
 		public string anchor;
+		[CCode (cname="data.mapping_start.tag")]
 		public string tag;
+		[CCode (cname="data.mapping_start.implicity")]
 		public int implicity;
+		[CCode (cname="data.mapping_start.style")]
 		public YAML.MappingStyle style;
 	}
 
-	/** 
-	 * The scalar parameters (for @c YAML_SCALAR_EVENT). 
+	/**
+	 * The scalar parameters (for @c YAML_SCALAR_EVENT).
 	 * */
-	[CCode (cname="yaml_event_scalar_t", has_type_id = false)]
-	public struct EventScalar {
+	[CCode (cname="yaml_event_t", has_type_id = false)]
+	public struct EventScalar : Event {
 		/* The anchor. */
+		[CCode (cname="data.scalar.anchor")]
 		public string anchor;
 		/* The tag. */
+		[CCode (cname="data.scalar.tag")]
 		public string tag;
 		/* The scalar value. */
+		[CCode (cname="data.scalar.value")]
 		public string value;
 		/* The length of the scalar value. */
+		[CCode (cname="data.scalar.length")]
 		public size_t length;
 		/* Is the tag optional for the plain style? */
+		[CCode (cname="data.scalar.plain_implicit")]
 		public int plain_implicit;
 		/* Is the tag optional for any non-plain style? */
+		[CCode (cname="data.scalar.quoted_implicit")]
 		public int quoted_implicit;
+		[CCode (cname="data.scalar.style")]
 		public ScalarStyle style;
-	}
-
-	[CCode (cname="yaml_event_data_t", has_type_id = false)]
-	public struct EventData {
-		public YAML.EventAlias alias;
-		public YAML.EventScalar scalar;
-		public YAML.EventSequenceStart sequence_start;
-		public YAML.EventMappingStart mapping_start;
 	}
 
 	[CCode (has_type_id = false,
@@ -227,14 +235,6 @@ namespace YAML {
 			event.type = YAML.EventType.NO_EVENT;
 		}
 		public EventType type;
-        [CCode (cname="data.alias")]
-		public YAML.EventAlias alias;
-        [CCode (cname="data.scalar")]
-		public YAML.EventScalar scalar;
-        [CCode (cname="data.sequence_start")]
-		public YAML.EventSequenceStart sequence_start;
-        [CCode (cname="data.mapping_start")]
-		public YAML.EventMappingStart mapping_start;
 		public Mark start_mark;
 		public Mark end_mark;
 
