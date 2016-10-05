@@ -1,19 +1,19 @@
-using GLib.YAML;
+using Yaml;
 
 /* Controller + View = UI, Model is declared later */
 namespace UI {
 	public static void main(string[] args) {
-		GLib.YAML.Builder b = new GLib.YAML.Builder("Model");
+		Yaml.Builder b = new Yaml.Builder("Model");
 		try {
 		var invoice = b.build_from_file(stdin) as Model.Invoice;
 		/* manipulating a property */
 		invoice.foo = "This is a simple test";
-		var w = new GLib.YAML.Writer();
+		var w = new Yaml.Writer();
 		var sb = new StringBuilder("");
 		w.stream_object(invoice, sb);
 		stdout.printf("reprinted invoice\n");
 		stdout.printf("%s\n", sb.str);
-		} catch (GLib.YAML.Exception e) {
+		} catch (Yaml.Exception e) {
 			error("%s", e.message);
 		}
 	}
