@@ -30,6 +30,6 @@ autoconf || exit $?
 cd $ORIGDIR || exit $?
 
 if ! test x$1 == x--no-configure; then
-./configure --enable-maintainer-mode $*
+./configure --enable-maintainer-mode "$*"
 fi;
 
