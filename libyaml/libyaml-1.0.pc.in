@@ -1,9 +1,0 @@
-libdir=@libdir@
-includedir=@includedir@
-
-Name: libyaml
-Description: a C library for parsing and emitting YAML
-Version: @VERSION@
-Requires: 
-Libs: -L${libdir} -lyaml
-Cflags: -I${includedir}
