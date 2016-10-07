@@ -14,12 +14,12 @@ pkgconfig_DATA = libyaml-glib-1.0.pc
 DISTCLEANFILES =  \
                  doltcompile doltlibtool  \
                  libyaml-glib-1.0.pc
-doc_DATA = README
+doc_DATA = README.rst
 
 EXTRA_DIST = \
 	autogen.sh \
 	gitlog-to-changelog \
-	README
+	README.rst
 
 dist-hook: gen-ChangeLog
 gen_start_date = 2009-03-01
