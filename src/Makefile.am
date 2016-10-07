@@ -28,8 +28,7 @@ endif
 
 vapi_DATA = libyaml-glib-1.0.vapi libyaml-glib-1.0.deps libyaml-1.0.vapi
 vapidir=$(datadir)/vala/vapi
-pkginclude_HEADERS = libyaml-glib-1.0.h \
-                     $(top_srcdir)/libyaml/include/yaml.h
+pkginclude_HEADERS = libyaml-glib-1.0.h
 
 EXTRA_DIST = libyaml-1.0.vapi \
              $(VALASOURCES) \
