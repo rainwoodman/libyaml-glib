@@ -120,6 +120,8 @@ namespace Yaml {
 		private delegate bool ParseFunc(string foo, void* location);
 		[CCode (has_target = false)]
 		private delegate void* NewFunc(string foo);
+		[CCode (has_target = false)]
+		private delegate void FreeFunc(void * foo);
 		private string prefix = null;
 		private HashTable<string, unowned Object> anchors = new HashTable<string, unowned Object>.full(str_hash, str_equal, g_free, null);
 		private List<Object> objects;
@@ -348,9 +350,9 @@ namespace Yaml {
 			if(pspec.value_type.is_a(Type.BOXED)) {
 				var strval = cast_to_scalar(node);
 				debug("working on a boxed type %s <- %s", pspec.value_type.name(), strval);
+                var free = (FreeFunc) Demangler.resolve_function(pspec.value_type.name(), "free");
 				try {
-					void * new_symbol = Demangler.resolve_function(pspec.value_type.name(), "new_from_string");
-					NewFunc new_func = (NewFunc) new_symbol;
+					var new_func = (NewFunc) Demangler.resolve_function(pspec.value_type.name(), "new_from_string");
 					void* memory = new_func(strval);
 					if(memory == null) {
 						throw new Yaml.Exception.BUILDER (
@@ -359,10 +361,10 @@ namespace Yaml {
 						pspec.value_type.name(),
 						node.start_mark.to_string());
 					}
-					memory = gvalue.get_boxed();
+                    gvalue.set_boxed(memory);
+                    free(memory);
 				} catch (Yaml.Exception.DEMANGLER e) {
-					void * parse_symbol = Demangler.resolve_function(pspec.value_type.name(), "parse");
-					ParseFunc parse_func = (ParseFunc) parse_symbol;
+					var parse_func = (ParseFunc) Demangler.resolve_function(pspec.value_type.name(), "parse");
 					void* memory = (void*) new char[MAX_BOXED_SIZE];
 					warning("Allocating %d bytes for Boxed type %s.",
 					MAX_BOXED_SIZE, pspec.value_type.name());
@@ -372,7 +374,8 @@ namespace Yaml {
 						node.get_location(),
 						pspec.value_type.name());
 					}
-					memory = gvalue.get_boxed();
+                    gvalue.set_boxed(memory);
+                    free(memory);
 				}
 			}  else
 			if(pspec.value_type.is_a(Type.ENUM)) {
@@ -441,8 +444,8 @@ namespace Yaml {
 			var value_scalar = (node as Yaml.Node.Scalar);
 			if(value_scalar == null) {
 				throw new Yaml.Exception.BUILDER (
-					"%s: Expecting scalar.",
-					node.get_location());
+					"%s: Expecting scalar but got %s",
+					node.get_location(), (node as GLib.Object).get_type().name());
 			}
 			return value_scalar.value;
 		}
