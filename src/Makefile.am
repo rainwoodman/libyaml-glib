@@ -11,14 +11,14 @@ BUILT_SOURCES = vala-ccode vala-doc
 
 $(DIST_SOURCES): vala-ccode
 
-vala-ccode: $(VALASOURCES) libyaml-1.0.vapi
-	$(VALAC) -g --library libyaml-glib-1.0 -H libyaml-glib-1.0.h -C $(VALASOURCES) libyaml-1.0.vapi --pkg gmodule-2.0
-	echo libyaml-1.0 > libyaml-glib-1.0.deps
+vala-ccode: $(VALASOURCES) yaml-0.1.vapi
+	$(VALAC) -g --library libyaml-glib-1.0 -H libyaml-glib-1.0.h -C $(VALASOURCES) yaml-0.1.vapi --pkg gmodule-2.0
+	echo yaml-0.1 > libyaml-glib-1.0.deps
 	touch $@
 
 if ENABLE_VALADOC
-vala-doc: $(VALASOURCES) libyaml-1.0.vapi
-	$(VALADOC) -o Documentation --package-name libyaml-glib-1.0 $(VALASOURCES) libyaml-1.0.vapi --pkg gmodule-2.0
+vala-doc: $(VALASOURCES) yaml-0.1.vapi
+	$(VALADOC) -o Documentation --package-name libyaml-glib-1.0 $(VALASOURCES) yaml-0.1.vapi --pkg gmodule-2.0
 	touch $@
 else
 vala-doc:
@@ -26,11 +26,11 @@ vala-doc:
 	touch $@
 endif
 
-vapi_DATA = libyaml-glib-1.0.vapi libyaml-glib-1.0.deps libyaml-1.0.vapi
+vapi_DATA = libyaml-glib-1.0.vapi libyaml-glib-1.0.deps yaml-0.1.vapi yaml-0.1.vapi
 vapidir=$(datadir)/vala/vapi
 pkginclude_HEADERS = libyaml-glib-1.0.h
 
-EXTRA_DIST = libyaml-1.0.vapi \
+EXTRA_DIST = yaml-0.1.vapi \
              $(VALASOURCES) \
              libyaml-glib-1.0.vapi \
              libyaml-glib-1.0.deps \
@@ -38,7 +38,7 @@ EXTRA_DIST = libyaml-1.0.vapi \
              vala-doc \
              Documentation
 
-DISTCLEANFILES = 
+DISTCLEANFILES =
 
 MAINTAINERCLEANFILES = $(VALASOURCES:.vala=.c) libyaml-glib-1.0.h \
                        libyaml-glib-1.0.vapi \
