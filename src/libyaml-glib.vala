@@ -54,7 +54,6 @@ namespace Yaml {
 	 *
 	 * */
 	public class Node {
-		public NodeType type;
 		/**
 		 * The tag of a node specifies its type.
 		 **/
