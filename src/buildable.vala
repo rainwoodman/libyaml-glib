@@ -67,9 +67,8 @@ namespace Yaml {
 		/**
 		 * Add a child to the buildable.
 		 *
-		 * @param type
-		 *   the custom children type,
-		 *   given as the key of the children sequence.
+		 * @param type the custom children type,
+		 *              given as the key of the children sequence.
 		 *
 		 */
 		public virtual void add_child(Builder builder, Object child, string? type) throws GLib.Error {
@@ -143,8 +142,7 @@ namespace Yaml {
 		}
 		/**
 		 * Return a list of children of the given type.
-		 * @param type
-		 *      if type == null, all children should be returned.
+		 * @param type if type == null, all children should be returned.
 		 *
 		 * the returned List doesn't hold references to the children.
 		 * AKA, free the returned list but do not free the children.
@@ -189,8 +187,7 @@ namespace Yaml {
 		/**
 		 * Processing the custom node.
 		 *
-		 * @param node
-		 *   the node. It is actually a Yaml.Node.
+		 * @param node the node. It is actually a Yaml.Node.
 		 */
 		public virtual void custom_node(Builder builder, string tag, Yaml.Node node) throws GLib.Error {
 			throw new Yaml.Exception.BUILDER (
