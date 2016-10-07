@@ -15,8 +15,10 @@ before_install:
       libyaml-dev valac valadoc
 
 before_script:
-    - ./autogen.sh
+    - ./autogen.sh --disable-valadoc
     - make
 
 script:
     - make check
+    - tests/libyaml-glib-parser -i
+    - tests/example-invoice < tests/invoice.yaml
