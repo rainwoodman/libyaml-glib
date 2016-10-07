@@ -11,7 +11,7 @@ namespace UI {
 		var w = new Yaml.Writer();
 		var sb = new StringBuilder("");
 		w.stream_object(invoice, sb);
-		stdout.printf("reprinted invoice\n");
+		stdout.printf("# reprinted invoice\n");
 		stdout.printf("%s\n", sb.str);
 		} catch (Yaml.Exception e) {
 			error("%s", e.message);
