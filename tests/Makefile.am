@@ -7,7 +7,7 @@ noinst_PROGRAMS = libyaml-glib-parser example-invoice
 LDADD = -lyaml-glib
 LDFLAGS = -L$(top_builddir)/src -export-dynamic
 CPPFLAGS = $(LIBYAML_CFLAGS) -I$(top_srcdir)/src $(GLIB_CFLAGS) 
-LIBS = $(GLIB_LIBS)
+LIBS = $(GLIB_LIBS) $(LIBYAML_LIBS)
 
 SUFFIXES = .vala .c
 .vala.c :
