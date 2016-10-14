@@ -22,7 +22,7 @@ AC_SUBST(docdir)
 
 PKG_PROG_PKG_CONFIG([0.21])
 
-PKG_CHECK_MODULES(GLIB, [glib-2.0 >= 2.10 gobject-2.0 >= 2.10 gmodule-2.0 >= 2.10])
+PKG_CHECK_MODULES(GLIB, [glib-2.0 >= 2.32 gobject-2.0 >= 2.32 gmodule-2.0 >= 2.32])
 AC_SUBST(GLIB_CFLAGS)
 AC_SUBST(GLIB_LIBS)
 
@@ -34,7 +34,7 @@ if test x$use_installed_libyaml = xno; then
 	LIBYAML_CFLAGS='-I$(top_srcdir)/libyaml/include';
 	LIBYAML_LIBS='$(top_builddir)/libyaml/src/libyaml.la';
 else
-	PKG_CHECK_MODULES(LIBYAML, libyaml >= 1.2 )
+	PKG_CHECK_MODULES(LIBYAML, libyaml >= 0.1.4 )
 fi;
 
 AC_SUBST(LIBYAML_CFLAGS)
