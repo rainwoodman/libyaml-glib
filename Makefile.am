@@ -1,19 +1,14 @@
 if USE_INSTALLED_LIBYAML
-SUBDIRS = src tests
+SUBDIRS = data src tests
 else
-SUBDIRS = src tests
+SUBDIRS = data src tests
 endif
 
 .PHONY: bootstrap gen-ChangeLog
 bootstrap: maintainer-clean
 	./autogen.sh
 
-pkgconfigdir = $(libdir)/pkgconfig
-pkgconfig_DATA = libyaml-glib-1.0.pc
-
-DISTCLEANFILES =  \
-                 doltcompile doltlibtool  \
-                 libyaml-glib-1.0.pc
+DISTCLEANFILES = doltcompile doltlibtool
 doc_DATA = README.rst
 
 EXTRA_DIST = \

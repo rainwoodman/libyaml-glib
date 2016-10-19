@@ -33,8 +33,9 @@ AC_SUBST(LIBYAML_LIBS)
 AM_CONDITIONAL(USE_INSTALLED_LIBYAML, [test x$use_builtin_libyaml == xno])
 
 AC_CONFIG_FILES([
-libyaml-glib-1.0.pc
 Makefile
+data/Makefile
+data/yaml-glib-1.0.pc
 src/Makefile
 tests/Makefile
 ])

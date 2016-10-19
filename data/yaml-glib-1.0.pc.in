@@ -1,7 +1,7 @@
 libdir=@libdir@
-includedir=@pkgincludedir@
+includedir=@includedir@
 
-Name: libyaml-glib
+Name: @PACKAGE@
 Description: The GLib wrapper of libYAML
 Version: @VERSION@
 Requires: libyaml-1.0 >= 0.1.2 gobject-2.0 >= 2.12
