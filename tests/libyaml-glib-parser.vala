@@ -71,20 +71,20 @@ public int main(string[] args) {
     try {
         Document document = new Document.from_parser(ref parser);
         foreach(Yaml.Node node in document.nodes) {
-            if(node is Yaml.Node.Scalar) {
-                message("node:(%p) %s", node, (node as Yaml.Node.Scalar).value);
+            if(node is Yaml.Scalar) {
+                message("node:(%p) %s", node, (node as Yaml.Scalar).value);
             } else
-                if(node is Yaml.Node.Alias) {
-                    message("alias:(%p) %s -> %p", 
+                if(node is Yaml.Alias) {
+                    message("alias:(%p) %s -> %p",
                             node,
-                            (node as Yaml.Node.Alias).node.anchor,
-                            (node as Yaml.Node.Alias).get_resolved()
+                            (node as Yaml.Alias).node.anchor,
+                            (node as Yaml.Alias).get_resolved()
                            );
-                } else 
-                    if(node is Yaml.Node.Mapping) {
+                } else
+                    if(node is Yaml.Mapping) {
                         message("mapping:(%p)", node);
-                    } else 
-                        if(node is Yaml.Node.Sequence) {
+                    } else
+                        if(node is Yaml.Sequence) {
                             message("sequence:(%p)", node);
                         }
         }

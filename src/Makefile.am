@@ -1,6 +1,18 @@
 lib_LTLIBRARIES = libyaml-glib.la
 
-VALASOURCES = libyaml-glib.vala error.vala buildable.vala builder.vala loader.vala writer.vala
+VALASOURCES = \
+	alias.vala \
+	buildable.vala \
+	builder.vala \
+	document.vala \
+	error.vala \
+	loader.vala  \
+	mapping.vala \
+	node.vala \
+	scalar.vala \
+	sequence.vala \
+	writer.vala
+
 libyaml_glib_la_SOURCES = $(VALASOURCES:.vala=.c) libyaml-glib-1.0.h
 libyaml_glib_la_CPPFLAGS = $(LIBYAML_CFLAGS) $(GLIB_CFLAGS)
 libyaml_glib_la_LIBADD = $(LIBYAML_LIBS) $(GLIB_LIBS)
@@ -12,13 +24,14 @@ BUILT_SOURCES = vala-ccode vala-doc
 $(DIST_SOURCES): vala-ccode
 
 vala-ccode: $(VALASOURCES) libyaml-1.0.vapi
-	$(VALAC) -g --library libyaml-glib-1.0 -H libyaml-glib-1.0.h -C $(VALASOURCES) libyaml-1.0.vapi --pkg gmodule-2.0
+	$(VALAC) -g --library libyaml-glib-1.0 -H libyaml-glib-1.0.h -C $(VALASOURCES) libyaml-1.0.vapi --pkg gmodule-2.0 --pkg gee-0.8
 	echo libyaml-1.0 > libyaml-glib-1.0.deps
+	echo gee-0.8 >> libyaml-glib-1.0.deps
 	touch $@
 
 if ENABLE_VALADOC
 vala-doc: $(VALASOURCES) libyaml-1.0.vapi
-	$(VALADOC) -o Documentation --package-name libyaml-glib-1.0 $(VALASOURCES) libyaml-1.0.vapi --pkg gmodule-2.0
+	$(VALADOC) -o Documentation --package-name libyaml-glib-1.0 $(VALASOURCES) libyaml-1.0.vapi --pkg gmodule-2.0 --pkg gee-0.8
 	touch $@
 else
 vala-doc:

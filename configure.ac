@@ -22,7 +22,7 @@ AC_SUBST(docdir)
 
 PKG_PROG_PKG_CONFIG([0.21])
 
-PKG_CHECK_MODULES(GLIB, [glib-2.0 >= 2.32 gobject-2.0 >= 2.32 gmodule-2.0 >= 2.32])
+PKG_CHECK_MODULES(GLIB, [glib-2.0 >= 2.32 gobject-2.0 >= 2.32 gmodule-2.0 >= 2.32 gee-0.8])
 AC_SUBST(GLIB_CFLAGS)
 AC_SUBST(GLIB_LIBS)
 

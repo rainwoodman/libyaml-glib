@@ -217,7 +217,7 @@ namespace Yaml {
 		private void bootstrap_objects(Yaml.Document document) throws Yaml.Exception {
 			foreach(var node in document.nodes) {
 				/* skip non objects */
-				if(!(node is Yaml.Node.Mapping)) continue;
+				if(!(node is Yaml.Mapping)) continue;
 				if(node.tag.get_char() != '!') continue;
 				/* bootstrap all objects with sufficient information */
 				bootstrap_object(node);
@@ -265,10 +265,10 @@ namespace Yaml {
 		}
 
 		private void process_object_value_node(Object obj, Yaml.Node node) throws Yaml.Exception {
-			var mapping = node as Yaml.Node.Mapping;
-			foreach(var key_node in mapping.keys) {
+			var mapping = node as Yaml.Mapping;
+			foreach(var key_node in mapping.pairs.keys) {
 				weak string key = cast_to_scalar(key_node);
-				var value_node = mapping.pairs.lookup(key_node).get_resolved();
+				var value_node = mapping.pairs.get(key_node).get_resolved();
 				if(get_child_type(obj, key) != Type.INVALID) {
 					process_children(obj, key, value_node);
 					continue;
@@ -328,7 +328,7 @@ namespace Yaml {
 			} else
 			if(pspec.value_type.is_a(typeof(Object))) {
 				Object ref_obj = null;
-				if(node is Node.Scalar) {
+				if(node is Scalar) {
 					ref_obj = get_object(cast_to_scalar(node));
 					if(ref_obj == null) {
 						throw new Yaml.Exception.BUILDER (
@@ -337,7 +337,7 @@ namespace Yaml {
 							cast_to_scalar(node));
 					}
 				} else
-				if(node is Yaml.Node.Mapping) {
+				if(node is Yaml.Mapping) {
 					ref_obj = build_object(node, pspec.value_type);
 				} else {
 					throw new Yaml.Exception.BUILDER (
@@ -441,7 +441,7 @@ namespace Yaml {
 		}
 
 		private unowned string cast_to_scalar(Yaml.Node node) throws Yaml.Exception {
-			var value_scalar = (node as Yaml.Node.Scalar);
+			var value_scalar = (node as Yaml.Scalar);
 			if(value_scalar == null) {
 				throw new Yaml.Exception.BUILDER (
 					"%s: Expecting scalar but got %s",
@@ -451,10 +451,10 @@ namespace Yaml {
 		}
 
 		private void process_internal_children(Object obj, Yaml.Node node) throws Yaml.Exception {
-			var children = node as Yaml.Node.Mapping;
-			foreach(var key_node in children.keys) {
+			var children = node as Yaml.Mapping;
+			foreach(var key_node in children.pairs.keys) {
 				var key = cast_to_scalar(key_node);
-				var value_node = children.pairs.lookup(key_node).get_resolved();
+				var value_node = children.pairs.get(key_node).get_resolved();
 				Object child = ((Buildable*) obj)->get_internal_child(this, key);
 				if(child == null) {
 					throw new Yaml.Exception.BUILDER (
@@ -470,7 +470,7 @@ namespace Yaml {
 				process_internal_children(obj, node);
 				return;
 			}
-			var children = node as Yaml.Node.Sequence;
+			var children = node as Yaml.Sequence;
 			foreach(var item in children.items) {
 				var child = build_object(item.get_resolved(), ((Buildable*)obj)->get_child_type(this, type));
 				assert(child != null);
@@ -493,8 +493,8 @@ namespace Yaml {
 		  */
 		public Object? get_object(string? anchor) {
 			if(anchor != null)
-			return anchors.lookup(anchor);
-			else 
+			return anchors.get(anchor);
+			else
 			return get_root_object();
 		}
 
