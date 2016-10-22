@@ -25,7 +25,6 @@ libtoolize --force --automake || exit $?
 autoheader || exit $?
 automake --add-missing || exit $?
 autoconf || exit $?
-(cd libyaml; autoreconf -vi;) || exit $?
 
 cd $ORIGDIR || exit $?
 

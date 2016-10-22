@@ -22,28 +22,24 @@ AC_SUBST(docdir)
 
 PKG_PROG_PKG_CONFIG([0.21])
 
-PKG_CHECK_MODULES(GLIB, [glib-2.0 >= 2.32 gobject-2.0 >= 2.32 gmodule-2.0 >= 2.32 gee-0.8])
+PKG_CHECK_MODULES(GLIB, [glib-2.0 >= 2.32 gobject-2.0 >= 2.32 gmodule-2.0 >= 2.32])
 AC_SUBST(GLIB_CFLAGS)
 AC_SUBST(GLIB_LIBS)
 
+PKG_CHECK_MODULES(GEE, gee-0.8 >= 0.6.4)
+AC_SUBST(GEE_CFLAGS)
+AC_SUBST(GEE_LIBS)
 
-WITH_INSTALLED([libyaml], [use_installed_libyaml])
-
-if test x$use_installed_libyaml = xno; then
-	AC_CONFIG_SUBDIRS([libyaml])
-	LIBYAML_CFLAGS='-I$(top_srcdir)/libyaml/include';
-	LIBYAML_LIBS='$(top_builddir)/libyaml/src/libyaml.la';
-else
-	PKG_CHECK_MODULES(LIBYAML, libyaml >= 0.1.4 )
-fi;
+PKG_CHECK_MODULES(LIBYAML, yaml-0.1 >= 0.1.2 )
 
 AC_SUBST(LIBYAML_CFLAGS)
 AC_SUBST(LIBYAML_LIBS)
 AM_CONDITIONAL(USE_INSTALLED_LIBYAML, [test x$use_builtin_libyaml == xno])
 
 AC_CONFIG_FILES([
-libyaml-glib-1.0.pc
 Makefile
+data/Makefile
+data/yaml-glib-1.0.pc
 src/Makefile
 tests/Makefile
 ])
