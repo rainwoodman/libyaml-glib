@@ -1,6 +1,0 @@
-tests/example*
-tests/run*
-doc/html/
-!*.c
-!*.h
-config.h
