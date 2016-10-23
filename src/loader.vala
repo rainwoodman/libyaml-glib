@@ -82,15 +82,12 @@ using YAML;
 			parse_with_throw(ref parser, out event);
 			assert(event.type == EventType.DOCUMENT_END_EVENT);
 			document.end_mark = event.end_mark;
-			
-			/* preserve the document order */
-			document.nodes.reverse();
 
 			/* resolve the aliases */
 			foreach(Node node in document.nodes) {
-				if(!(node is Node.Alias)) continue;
-				var alias_node = node as Node.Alias;
-				alias_node.node = document.anchors.lookup(alias_node.anchor);
+				if(!(node is Alias)) continue;
+				var alias_node = node as Alias;
+				alias_node.node = document.anchors.get(alias_node.anchor);
 				if(alias_node != null) continue;
 				throw new Yaml.Exception.LOADER (
 					"Alias '%s' cannot be resolved.",
@@ -120,12 +117,11 @@ using YAML;
 		}
 		public Node? load_alias(ref Parser parser, ref Event event)
 		throws Yaml.Exception {
-			Node.Alias node = new Node.Alias();
-			node.anchor = ((EventAlias) event).anchor;
+			Alias node = Object.new (typeof (Alias), anchor: ((EventAlias) event).anchor) as Alias;
 
 			/* Push the node to the document stack
 			 * Do not register the anchor because it is an alias */
-			document.nodes.prepend(node);
+			document.nodes.add(node);
 
 			return node;
 		}
@@ -137,48 +133,44 @@ using YAML;
 		}
 		public Node? load_scalar(ref Parser parser, ref Event event)
 		throws Yaml.Exception {
-			Node.Scalar node = new Node.Scalar();
-			node.anchor = ((EventScalar) event).anchor;
-			node.tag = normalize_tag(((EventScalar) event).tag,
-					DEFAULT_SCALAR_TAG);
-			node.value = ((EventScalar) event).value;
-			node.style = ((EventScalar) event).style;
-			node.start_mark = event.start_mark;
-			node.end_mark = event.end_mark;
+			Scalar node = Object.new (typeof (Scalar),
+					anchor:((EventScalar) event).anchor,
+					tag: normalize_tag(((EventScalar) event).tag, DEFAULT_SCALAR_TAG),
+					value: ((EventScalar) event).value,
+					style: ((EventScalar) event).style,
+					start_mark: event.start_mark,
+					end_mark: event.end_mark) as Scalar;
 
 			/* Push the node to the document stack
 			 * and register the anchor */
-			document.nodes.prepend(node);
+			document.nodes.add(node);
 			if(node.anchor != null)
-				document.anchors.insert(node.anchor, node);
+				document.anchors.set(node.anchor, node);
 			return node;
 		}
 		public Node? load_sequence(ref Parser parser, ref Event event)
 		throws Yaml.Exception {
-			Node.Sequence node = new Node.Sequence();
-			node.anchor = ((EventSequenceStart) event).anchor;
-			node.tag = normalize_tag(((EventSequenceStart) event).tag,
-					DEFAULT_SEQUENCE_TAG);
-			node.style = ((EventSequenceStart) event).style;
-			node.start_mark = event.start_mark;
-			node.end_mark = event.end_mark;
+			Sequence node = Object.new (typeof (Sequence),
+				style: ((EventSequenceStart) event).style,
+				anchor: ((EventSequenceStart) event).anchor,
+				tag: normalize_tag(((EventSequenceStart) event).tag, DEFAULT_SEQUENCE_TAG),
+				start_mark: event.start_mark,
+				end_mark: event.end_mark) as Sequence;
 
 			/* Push the node to the document stack
 			 * and register the anchor */
-			document.nodes.prepend(node);
+			document.nodes.add(node);
 			if(node.anchor != null)
-				document.anchors.insert(node.anchor, node);
+				document.anchors.set(node.anchor, node);
 
 			/* Load the items in the sequence */
 			parse_with_throw(ref parser, out event);
 			while(event.type != EventType.SEQUENCE_END_EVENT) {
 				Node item = load_node(ref parser, ref event);
 				/* prepend is faster than append */
-				node.items.prepend(item);
+				node.items.add(item);
 				parse_with_throw(ref parser, out event);
 			}
-			/* Preserve the document order */
-			node.items.reverse();
 
 			/* move the end mark of the mapping
 			 * to the END_SEQUENCE_EVENT */
@@ -187,19 +179,18 @@ using YAML;
 		}
 		public Node? load_mapping(ref Parser parser, ref Event event)
 		throws Yaml.Exception {
-			Node.Mapping node = new Node.Mapping();
-			node.tag = normalize_tag(((EventMappingStart) event).tag,
-					DEFAULT_MAPPING_TAG);
-			node.anchor = ((EventMappingStart) event).anchor;
-			node.style = ((EventMappingStart) event).style;
-			node.start_mark = event.start_mark;
-			node.end_mark = event.end_mark;
+			Mapping node = Object.new (typeof (Mapping),
+					tag: normalize_tag(((EventMappingStart) event).tag, DEFAULT_MAPPING_TAG),
+					anchor: ((EventMappingStart) event).anchor,
+					style: ((EventMappingStart) event).style,
+					start_mark: event.start_mark,
+					end_mark: event.end_mark) as Mapping;
 
 			/* Push the node to the document stack
 			 * and register the anchor */
-			document.nodes.prepend(node);
+			document.nodes.add(node);
 			if(node.anchor != null)
-				document.anchors.insert(node.anchor, node);
+				document.anchors.set(node.anchor, node);
 
 			/* Load the items in the mapping */
 			parse_with_throw(ref parser, out event);
@@ -207,12 +198,9 @@ using YAML;
 				Node key = load_node(ref parser, ref event);
 				parse_with_throw(ref parser, out event);
 				Node value = load_node(ref parser, ref event);
-				node.pairs.insert(key, value);
-				node.keys.prepend(key);
+				node.pairs.set(key, value);
 				parse_with_throw(ref parser, out event);
 			}
-			/* Preserve the document order */
-			node.keys.reverse();
 
 			/* move the end mark of the mapping
 			 * to the END_MAPPING_EVENT */

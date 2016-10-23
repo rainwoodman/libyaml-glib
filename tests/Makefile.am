@@ -1,13 +1,13 @@
 
-VALAPKGS = --pkg libyaml-glib-1.0
+VALAPKGS = --pkg libyaml-glib-1.0 --pkg gee-0.8
 VALAFLAGS = --vapidir ../src
 
 noinst_PROGRAMS = libyaml-glib-parser example-invoice
 
 LDADD = -lyaml-glib
 LDFLAGS = -L$(top_builddir)/src -export-dynamic
-CPPFLAGS = $(LIBYAML_CFLAGS) -I$(top_srcdir)/src $(GLIB_CFLAGS) 
-LIBS = $(GLIB_LIBS) $(LIBYAML_LIBS)
+CPPFLAGS = $(LIBYAML_CFLAGS) $(GEE_CFLAGS) -I$(top_srcdir)/src $(GLIB_CFLAGS) 
+LIBS = $(GLIB_LIBS) $(LIBYAML_LIBS) $(GEE_LIBS)
 
 SUFFIXES = .vala .c
 .vala.c :
