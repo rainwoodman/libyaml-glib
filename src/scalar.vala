@@ -42,7 +42,7 @@ public class Yaml.Scalar : Node {
 
 	public string value { get; construct set; }
 
-	public Scalar (ScalarStyle style) {
+	public Scalar (ScalarStyle style = YAML.ScalarStyle.ANY_SCALAR_STYLE) {
 		Object (style: style);
 	}
 }

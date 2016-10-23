@@ -44,7 +44,7 @@ public class Yaml.Mapping : Node {
 
 	public Gee.Map<Node, Node> pairs { get; construct; }
 
-	public Mapping (MappingStyle style) {
+	public Mapping (MappingStyle style = YAML.MappingStyle.ANY_MAPPING_STYLE) {
 		Object (style: style, pairs: new Gee.HashMap<Node, Node> ());
 	}
 }

@@ -41,7 +41,7 @@ public class Yaml.Sequence : Node {
 
 	public Gee.List<Node> items { get; construct; }
 
-	public Sequence (SequenceStyle style) {
+	public Sequence (SequenceStyle style = YAML.SequenceStyle.ANY_SEQUENCE_STYLE) {
 		Object (style: style, items: new Gee.ArrayList<Node> ());
 	}
 }
