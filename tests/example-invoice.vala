@@ -86,7 +86,7 @@ namespace Model {
 		}
 
 		/* declaring the types of child objects and corresponding yaml tags */
-		private static const string[] tags = {"product"};
+		private const string[] tags = {"product"};
 		private static Type[] types= {typeof(Product)};
 
 		/* register the type with Buildable,
