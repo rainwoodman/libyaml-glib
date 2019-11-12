@@ -35,7 +35,8 @@ namespace Yaml {
 	 * The root of the document is a mapping, which is built to an object. 
 	 * Other objects are inserted into children of the root object, 
 	 * supplied as items in sequences.
-	 *
+    *
+	 * {{{
 	 * ++ Two Stages of Building ++
 	 * # First stage, Bootstrap.
 	 *   an object is created for each mapping which has a YAML tag
@@ -86,6 +87,7 @@ namespace Yaml {
 	 *   because GLib doesn't store the size of a Boxed type.
 	 *   Rule of thumb: Always implement _new_from_string(string)!
 	 * ]
+    * }}}
 	 *
 	 * Here is an example of the YAML file, 
 	 * which is semantically equivalent to the GtkBuilder example given in 
@@ -105,12 +107,13 @@ namespace Yaml {
 	 *           use-stock: true
 	 * }}}
 	 *
+    * {{{
 	 * [warning:
 	 *   Although this example is a valid YAML understood by the Builder, 
 	 *   it cannot be used to build the widgets, because GtkWidget 
 	 *   doesn't implement the required GYAMLBuildable interface.
 	 * ]
-	 *
+	 * }}}
 	 *
 	 * */
 	public class Builder : GLib.Object {
@@ -183,6 +186,7 @@ namespace Yaml {
 		 * If the an object is already built for the node, it will return 
 		 * the built object.
 		 *
+       * {{{
 		 * [warning:
 		 *   Do not call this function in any places other than 
 		 *   the implementation of the Builable interface. It depends 
@@ -190,11 +194,10 @@ namespace Yaml {
 		 *   the object building process. Once the objects are built, 
 		 *   these data structures are destroyed.
 		 * ]
+       * }}}
 		 *
-		 * @param node
-		 *   the node to build the object
-		 * @param type
-		 *   the expected type of the object
+		 * @param node the node to build the object
+		 * @param type the expected type of the object
 		 *
 		 * @return the built object
 		 */
@@ -249,7 +252,7 @@ namespace Yaml {
 			if(node.anchor != null) {
 				anchors.insert(node.anchor, obj);
 			}
-			node.set_pointer(obj.ref(), g_object_unref);
+			node.set_pointer(obj.ref(), Object.unref);
 			obj.set_data("node", node);
 			objects.prepend(obj);
 			return obj;

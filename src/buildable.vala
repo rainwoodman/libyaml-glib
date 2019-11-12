@@ -144,7 +144,7 @@ namespace Yaml {
 		 * Return a list of children of the given type.
 		 * @param type if type == null, all children should be returned.
 		 *
-		 * the returned List doesn't hold references to the children.
+		 * @return the returned List doesn't hold references to the children.
 		 * AKA, free the returned list but do not free the children.
 		 * */
 		public virtual List<unowned Object>? get_children(string? type) {
