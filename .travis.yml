@@ -8,15 +8,19 @@ compiler:
 
 before_install:
     - sudo add-apt-repository --yes ppa:vala-team
+    - sudo apt-get -qq update
     - sudo apt-get update --quiet
-    - sudo apt-get install --yes --force-yes build-essential libglib2.0-dev
-      libyaml-dev valac valadoc
+    - sudo apt-get install --yes --force-yes python3 build-essential
+      libglib2.0-dev libgtk-3-dev libgirepository1.0-dev python3-pip ninja-build libyaml-dev
+      valac valadoc
+    - sudo pip3 install --upgrade pip
+    - sudo pip3 install setuptools
+    - sudo pip3 install meson
 
 before_script:
-    - ./autogen.sh --disable-valadoc
-    - make
+    - mkdir build
+    - meson -Dintrospection=false build
+    - ninja -C build
 
 script:
-    - make check
-    - tests/libyaml-glib-parser -i
-    - tests/example-invoice < tests/invoice.yaml
+    - ninja -C build test
