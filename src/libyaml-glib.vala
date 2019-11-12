@@ -70,8 +70,8 @@ namespace Yaml {
 		 * The anchor or the alias.
 		 *
 		 * The meanings of anchor differ for Alias node and other node types.
-		 *  * For Alias it is the referring anchor,
-		 *  * For Scalar, Sequence, and Mapping, it is the real anchor.
+		 * * For Alias it is the referring anchor,
+		 * * For Scalar, Sequence, and Mapping, it is the real anchor.
 		 */
 		public string anchor;
 
@@ -86,8 +86,7 @@ namespace Yaml {
 		/**
 		 * Store a pointer to the node.
 		 * 
-		 * @param notify
-		 *   the function to be called when the pointer is freed
+		 * @param notify the function to be called when the pointer is freed
 		 */
 		public void set_pointer(void* pointer, DestroyNotify? notify = null) {
 			if(this.pointer != null && destroy_notify != null) {
@@ -181,12 +180,14 @@ namespace Yaml {
 	 *
 	 * The document model based on GType classes replaces the original libyaml
 	 * document model.
-	 *
+    *
+	 * {{{
 	 * [warning:
 	 *  This is not a full implementation of a YAML document.
 	 *  The document tag directive is missing.
 	 *  Alias is not immediately resolved and replaced with the referred node.
 	 * ]
+    * }}}
 	 */
 	public class Document {
 		/* List of nodes */

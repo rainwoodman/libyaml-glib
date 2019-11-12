@@ -5,7 +5,8 @@ namespace UI {
 	public static void main(string[] args) {
 		Yaml.Builder b = new Yaml.Builder("Model");
 		try {
-		var invoice = b.build_from_file(stdin) as Model.Invoice;
+		var file = FileStream.open(args[1], "r");
+		var invoice = b.build_from_file(file) as Model.Invoice;
 		/* manipulating a property */
 		invoice.foo = "This is a simple test";
 		var w = new Yaml.Writer();
@@ -86,7 +87,7 @@ namespace Model {
 		}
 
 		/* declaring the types of child objects and corresponding yaml tags */
-		private static const string[] tags = {"product"};
+		private const string[] tags = {"product"};
 		private static Type[] types= {typeof(Product)};
 
 		/* register the type with Buildable,

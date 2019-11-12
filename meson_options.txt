@@ -1,0 +1,3 @@
+option('gtk_doc', type: 'boolean', value: false, description: 'build GTK Doc reference')
+option('introspection', type: 'boolean', value: true, description: 'build introspection support')
+option('man', type: 'boolean', value: true, description: 'build manual pages')
